@@ -9,7 +9,7 @@ private:
     std::vector<double> weights;
 
     std::vector<double> compute_gradient(std::vector<double>, std::vector<std::vector<double>>);
-    std::vector<double> gradient_descent(std::vector<double>, std::vector<double>, double);
+    void gradient_descent(std::vector<double>, double);
     double mean_squared_error(std::vector<double>);
     std::vector<double> mean(std::vector<std::vector<double>>);
     double mean(std::vector<double>);
@@ -18,7 +18,7 @@ private:
 
 public:
     LinearRegression() {};
-    void fit(std::vector<std::vector<double>>, std::vector<double>);
+    void fit(std::vector<std::vector<double>>);
     void train(std::vector<std::vector<double>>, std::vector<double>, double, double, int);
     std::vector<double> predict(std::vector<std::vector<double>>);
     void normalize(std::vector<std::vector<double>>);
