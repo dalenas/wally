@@ -1,16 +1,12 @@
 #ifndef LINEAR_REGRESSION_H
 #define LINEAR_REGRESSION_H
 
-#include <cmath>
-#include <iostream>
-#include <vector>
+#include "mlearn.h"
 
 constexpr int BIAS = 0;
 
 class LinearRegression {
 private:
-    std::vector<double> weights;
-
     std::vector<double> compute_gradient(const std::vector<double>&, const std::vector<std::vector<double>>&);
     void gradient_descent(const std::vector<double>&, const double&);
     std::vector<double> errors(const std::vector<double>&, const std::vector<double>&);
@@ -19,6 +15,8 @@ private:
     double mean(const std::vector<double>&);
     std::vector<double> standard_deviation(const std::vector<std::vector<double>>&);
     double standard_deviation(const std::vector<double>&);
+protected:
+    std::vector<double> weights;
 public:
     LinearRegression() = default;
     void fit(const std::vector<std::vector<double>>&);
