@@ -1,11 +1,15 @@
 #include "../lib/linear_regression.h"
 
 std::vector<double> LinearRegression::mean(const std::vector<std::vector<double>>& X) {
+    int points = X.size();
     int dimension = X[0].size();
 
     std::vector<double> avgs(dimension, 0);
-    for(int i = 0; i < dimension; ++i)
-        avgs[i] = mean(X[i]);
+    for(int i = 0; i < dimension; ++i) {
+        for(int point = 0; point < points; ++point)
+            avgs[i] += X[point][i];
+        avgs[i] /= points;
+    }
 
     return avgs;
 }
@@ -14,7 +18,7 @@ double LinearRegression::mean(const std::vector<double>& x) {
     int points = x.size();
 
     double avg = 0;
-    for(int point = 0; point < points; ++points)
+    for(int point = 0; point < points; ++point)
         avg += x[point];
     
     avg /= points;
@@ -22,11 +26,16 @@ double LinearRegression::mean(const std::vector<double>& x) {
 }
 
 std::vector<double> LinearRegression::standard_deviation(const std::vector<std::vector<double>>& X) {
+    int points = X.size();
     int dimension = X[0].size();
 
+    std::vector<double> avgs = mean(X);
     std::vector<double> std_devs(dimension, 0);
-    for(int i = 0; i < dimension; ++i)
-        std_devs[i] = standard_deviation(X[i]);
+    for(int i = 0; i < dimension; ++i) {
+        for(int point = 0; point < points; ++point)
+            std_devs[i] += pow(X[point][i] - avgs[i], 2);
+        std_devs[i] = sqrtf(std_devs[i] / points);
+    }
     
     return std_devs;
 }
@@ -47,7 +56,7 @@ std::vector<double> LinearRegression::errors(const std::vector<double>& y_pred, 
     int points = y.size();
 
     std::vector<double> errors(points, 0);
-    for(int point = 0; point < points; ++points)
+    for(int point = 0; point < points; ++point)
         errors[point] = y_pred[point] - y[point];
     
     return errors;
@@ -70,12 +79,12 @@ std::vector<double> LinearRegression::compute_gradient(const std::vector<double>
 
     std::vector<double> gradient(parameters, 0);
     for(int point = 0; point < points; ++point)
-        gradient[0] += errors[point];
-    gradient[0] *= 2 / points;
+        gradient[BIAS] += errors[point];
+    gradient[BIAS] = 2 * gradient[BIAS] / points;
     for(int i = 1; i < parameters; ++i) {
         for(int point = 0; point < points; ++point)
             gradient[i] += errors[point]*X[point][i-1];
-        gradient[i] *= 2 / points;
+        gradient[i] = 2 * gradient[i] / points;
     }
 
     return gradient;
@@ -128,7 +137,7 @@ std::vector<std::vector<double>> LinearRegression::normalize(const std::vector<s
 
     std::vector<double> avgs = mean(X);
     std::vector<double> std_devs = standard_deviation(X);
-    std::vector<std::vector<double>> X_norm(dimension, std::vector<double>(points, 0));
+    std::vector<std::vector<double>> X_norm(points, std::vector<double>(dimension, 0));
     for(int i = 0; i < dimension; ++i) {
         for(int point = 0; point < points; ++point)
             X_norm[point][i] = (X[point][i] - avgs[i]) / std_devs[i];
@@ -147,4 +156,13 @@ std::vector<double> LinearRegression::normalize(const std::vector<double>& x) {
         x_norm[point] = (x[point] - avg) / std_dev;
 
     return x_norm;
+}
+
+void LinearRegression::_params() {
+    int params = weights.size()-1;
+
+    std::cout << '[';
+    for(int i = 0; i < params; ++i)
+        std::cout << weights[i] << ", ";
+    std::cout << weights[params] << ']';
 }

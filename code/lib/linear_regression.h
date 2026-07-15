@@ -2,7 +2,10 @@
 #define LINEAR_REGRESSION_H
 
 #include <cmath>
+#include <iostream>
 #include <vector>
+
+constexpr int BIAS = 0;
 
 class LinearRegression {
 private:
@@ -16,15 +19,15 @@ private:
     double mean(const std::vector<double>&);
     std::vector<double> standard_deviation(const std::vector<std::vector<double>>&);
     double standard_deviation(const std::vector<double>&);
-    // std::vector<std::vector<double>> transpose(std::vector<std::vector<double>>);
 public:
-    LinearRegression() {};
+    LinearRegression() = default;
     void fit(const std::vector<std::vector<double>>&);
     void train(const std::vector<std::vector<double>>&, const std::vector<double>&, double, double, int);
     std::vector<double> predict(const std::vector<std::vector<double>>&);
     std::vector<std::vector<double>> normalize(const std::vector<std::vector<double>>&);
     std::vector<double> normalize(const std::vector<double>&);
-    ~LinearRegression();
+    void _params();
+    ~LinearRegression() = default;
 };
 
 #endif
