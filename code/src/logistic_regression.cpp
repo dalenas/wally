@@ -52,10 +52,106 @@ double LogisticRegression::standard_deviation(const std::vector<double>& x) {
     return std_dev;
 }
 
-void LogisticRegression::fit(const std::vector<std::vector<double>>& X) {
+std::vector<std::vector<int>> LogisticRegression::one_hot_encoding(const std::vector<int>& y) {
+    int points = y.size();
+
+    int classes = 0;
+    for(int i = 0; i < points; ++i)
+        if(y[i] >= classes) ++classes;
+
+    std::vector<std::vector<int>> one_hot(points, std::vector<int>(classes, 0));
+    for(int point = 0; point < points; ++point)
+        one_hot[point][y[point]] = 1;
+
+    return one_hot;
+}
+
+double LogisticRegression::cross_entropy(const std::vector<std::vector<double>>& X, const std::vector<int>& y) {
+    int points = y.size();
+    
+    std::vector<std::vector<int>> one_hot = one_hot_encoding(y);
+
+}
+
+double LogisticRegression::z_k(const std::vector<double>& x, const int& k) {
+    int parameters = weights[k].size();
+
+    double z_k = weights[k][0];
+    for(int i = 1; i < parameters; ++i)
+        z_k += weights[k][i]*x[i-1];
+
+    return z_k;
+}
+
+std::vector<double> LogisticRegression::z(const std::vector<double>& x) {
+    int classes = weights.size();
+    int parameters = weights[0].size();
+    
+    std::vector<double> z(parameters, 0);
+    for(int k = 0; k < classes; ++k)
+        z[k] = z_k(x, k);
+
+    return z;
+}
+
+std::vector<std::vector<double>> LogisticRegression::Z(const std::vector<std::vector<double>>& X) {
+    int points = X.size();
+    int classes = weights.size();
+
+    std::vector<std::vector<double>> Z(points, std::vector<double>(classes, 0));
+    for(int point = 0; point < points; ++point)
+        Z[point] = z(X[point]);
+    
+    return Z;
+}
+
+/*
+double LogisticRegression::sigmoid_k(const std::vector<double>& x, const int& k) {
+    
+}
+
+std::vector<double> LogisticRegression::sigmoid(const std::vector<double>& x) {
+    int points = x.size();
+
+}
+
+std::vector<std::vector<double>> LogisticRegression::sigmoid(const std::vector<std::vector<double>>& X) {
+
+}
+*/
+
+std::vector<double> LogisticRegression::softmax(const std::vector<double>& x) {
+    int classes = weights.size();
+    int parameters = weights[0].size();
+
+    std::vector<double> exps(classes, 0);
+    double norm = 0;
+    for(int k = 0; k < classes; ++k) {
+        exps[k] = exp(z_k(x, k));
+        norm += exps[k];
+    }
+
+    std::vector<double> softmax(classes, 0);
+    for(int k = 0; k < classes; ++k)
+        softmax[k] = exps[k] / norm;
+
+    return softmax;
+}
+
+int LogisticRegression::softmax_max(const std::vector<double>& softmax) {
+    int classes = weights.size();
+
+    int max_index = 0;
+    for(int k = 0; k < classes; ++k)
+        if(softmax[k] > softmax[max_index]) max_index = k;
+    
+    return max_index;
+}
+
+/*void LogisticRegression::fit(const std::vector<std::vector<double>>& X) {
     int parameters = X[0].size() + 1;
     weights.reserve(parameters);
 
     for(int i = 0; i < parameters; ++i)
         weights.push_back(0);
-}
+}*/
