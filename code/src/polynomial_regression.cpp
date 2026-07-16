@@ -8,13 +8,6 @@ int PolynomialRegression::num_features(const int& dimension) {
     for(int k = 1; k <= degree; ++k) {
         int n = dimension + k - 1;
         features += choose(n, k);
-        
-        /*for(int n_div_k = k+1; n_div_k <= n; ++n_div_k)
-            n_choose_k *= n_div_k;
-        for(int n_minus_k = n - k; n_minus_k > 1; --n_minus_k)
-            n_choose_k /= n_minus_k;
-        
-        features += n_choose_k;*/
     }
     return features;
 }
@@ -76,31 +69,3 @@ std::vector<std::vector<double>> PolynomialRegression::transform(const std::vect
     }
     return X_transform;
 }
-
-
-
-/*
-int main() {
-    int degree = 3;
-    int dimension = 3;
-    int feature_vectors = 4;
-    PolynomialRegression model(degree);
-    int features = model.num_features(dimension);
-    std::vector<std::vector<double>> X(feature_vectors, std::vector<double>(dimension, 0));
-
-    for(int i = 0; i < feature_vectors; ++i) {
-        for(int j = 0; j < dimension; ++j)
-            X[i][j] = pow(i, 2) + j;
-    }
-
-    std::vector<std::vector<double>> X_transform = model.transform(X);
-
-    for(int i = 0; i < feature_vectors; ++i) {
-        for(int j = 0; j < features; ++j)
-            std::cout << X_transform[i][j] << ' ';
-        std::cout << std::endl;
-    }
-
-    return 0;
-}
-*/
