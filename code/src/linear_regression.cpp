@@ -99,10 +99,7 @@ void LinearRegression::gradient_descent(const std::vector<double>& gradient, con
 
 void LinearRegression::fit(const std::vector<std::vector<double>>& X) {
     int parameters = X[0].size() + 1;
-    weights.reserve(parameters);
-
-    for(int i = 0; i < parameters; ++i)
-        weights.push_back(0);
+    weights = std::vector<double>(parameters, 0);
 }
 
 void LinearRegression::train(const std::vector<std::vector<double>>& X, const std::vector<double>& y, double learning_rate=0.05, double tol=1e-6, int max_iter=100) {
