@@ -27,7 +27,8 @@ public:
     std::vector<std::vector<double>> normalize(const std::vector<std::vector<double>>&);
     void fit(const std::vector<std::vector<double>>&);
     void train(const std::vector<std::vector<double>>&, const std::vector<double>&, double, double, int);
-    std::vector<double> predict(const std::vector<std::vector<double>>&);
+    std::vector<int> predict(const std::vector<std::vector<double>>&);
+    void _params();
     ~BinaryLogisticRegression() = default;
 };
 

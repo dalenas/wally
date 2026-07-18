@@ -129,3 +129,67 @@ void BinaryLogisticRegression::gradient_descent(const std::vector<double>& gradi
     for(int j = 0; j < parameters; ++j)
         weights[j] -= learning_rate*gradient[j];
 }
+
+std::vector<double> BinaryLogisticRegression::normalize(const std::vector<double>& x) {
+    int points = x.size();
+
+    double avg = mean(x);
+    double std_dev = standard_deviation(x);
+    std::vector<double> x_norm(points, 0);
+    for(int i = 0; i < points; ++i)
+        x_norm[i] = (x[i] - avg) / std_dev;
+
+    return x_norm;
+}
+
+std::vector<std::vector<double>> BinaryLogisticRegression::normalize(const std::vector<std::vector<double>>& X) {
+    int points = X.size();
+    int features =  X[0].size();
+
+    std::vector<double> avgs = mean(X);
+    std::vector<double> std_devs = standard_deviation(X);
+    std::vector<std::vector<double>> X_norm(points, std::vector<double>(features, 0));
+    for(int j = 0; j < features; ++j) {
+        for(int i = 0; i < points; ++i)
+            X_norm[i][j] = (X[i][j] - avgs[j]) / std_devs[j];
+    }
+
+    return X_norm;
+}
+
+void BinaryLogisticRegression::fit(const std::vector<std::vector<double>>& X) {
+    int parameters = X[0].size() + 1;
+    weights = std::vector<double>(parameters, 0);
+}
+
+std::vector<int> BinaryLogisticRegression::predict(const std::vector<std::vector<double>>& X) {
+    int points = 0;
+
+    std::vector<double> p = sigmoid(X);
+    std::vector<int> y_pred(points, 0);
+    for(int i = 0; i < points; ++i)
+        if(p[i] > 0.5) y_pred[i] = 1;
+    
+    return y_pred;
+}
+
+void BinaryLogisticRegression::train(const std::vector<std::vector<double>>& X, const std::vector<double>& y, double learning_rate, double tol, int max_iter) {
+    for(int k = 0; k < max_iter; ++k) {
+        std::vector<double> p = sigmoid(X);
+
+        if(abs(log_loss(y, p)) < tol)
+            return;
+
+        std::vector<double> gradient = compute_gradient(X, y, p);
+        gradient_descent(gradient, learning_rate);
+    }
+}
+
+void BinaryLogisticRegression::_params() {
+    int params = weights.size() - 1;
+
+    std::cout << '[';
+    for(int i = 0; i < params; ++i)
+        std::cout << weights[i] << ", ";
+    std::cout << weights[params] << ']';
+}
