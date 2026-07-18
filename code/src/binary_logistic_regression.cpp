@@ -87,7 +87,7 @@ std::vector<double> BinaryLogisticRegression::sigmoid(const std::vector<std::vec
     return sigmoid;
 }
 
-std::vector<double> BinaryLogisticRegression::compute_errors(const std::vector<double>& y, const std::vector<double>& p) {
+std::vector<double> BinaryLogisticRegression::compute_errors(const std::vector<int>& y, const std::vector<double>& p) {
     int points = y.size();
 
     std::vector<double> errors(points, 0);
@@ -97,7 +97,7 @@ std::vector<double> BinaryLogisticRegression::compute_errors(const std::vector<d
     return errors;
 }
 
-double BinaryLogisticRegression::log_loss(const std::vector<double>& y, const std::vector<double>& p) {
+double BinaryLogisticRegression::log_loss(const std::vector<int>& y, const std::vector<double>& p) {
     int points = y.size();
 
     double loss = 0;
@@ -107,7 +107,7 @@ double BinaryLogisticRegression::log_loss(const std::vector<double>& y, const st
     return loss;
 }
 
-std::vector<double> BinaryLogisticRegression::compute_gradient(const std::vector<std::vector<double>>& X, const std::vector<double>& y, const std::vector<double>& p) {
+std::vector<double> BinaryLogisticRegression::compute_gradient(const std::vector<std::vector<double>>& X, const std::vector<int>& y, const std::vector<double>& p) {
     int points = X.size();
     int parameters = weights.size();
 
@@ -115,9 +115,11 @@ std::vector<double> BinaryLogisticRegression::compute_gradient(const std::vector
     std::vector<double> gradient(parameters, 0);
     for(int i = 0; i < points; ++i)
         gradient[0] += errors[i];
+    gradient[0] /= points;
     for(int j = 1; j < parameters; ++j) {
         for(int i = 0; i < points; ++i)
-            gradient[j] += errors[i]*X[i][j];
+            gradient[j] += errors[i]*X[i][j-1];
+        gradient[j] /= points;
     }
 
     return gradient;
@@ -163,7 +165,7 @@ void BinaryLogisticRegression::fit(const std::vector<std::vector<double>>& X) {
 }
 
 std::vector<int> BinaryLogisticRegression::predict(const std::vector<std::vector<double>>& X) {
-    int points = 0;
+    int points = X.size();
 
     std::vector<double> p = sigmoid(X);
     std::vector<int> y_pred(points, 0);
@@ -173,7 +175,7 @@ std::vector<int> BinaryLogisticRegression::predict(const std::vector<std::vector
     return y_pred;
 }
 
-void BinaryLogisticRegression::train(const std::vector<std::vector<double>>& X, const std::vector<double>& y, double learning_rate, double tol, int max_iter) {
+void BinaryLogisticRegression::train(const std::vector<std::vector<double>>& X, const std::vector<int>& y, double learning_rate, double tol, int max_iter) {
     for(int k = 0; k < max_iter; ++k) {
         std::vector<double> p = sigmoid(X);
 

@@ -17,16 +17,16 @@ private:
     double sigmoid(const std::vector<double>&);
     std::vector<double> sigmoid(const std::vector<std::vector<double>>&);
 
-    std::vector<double> compute_errors(const std::vector<double>&, const std::vector<double>&);
-    double log_loss(const std::vector<double>&, const std::vector<double>&);
-    std::vector<double> compute_gradient(const std::vector<std::vector<double>>&, const std::vector<double>&, const std::vector<double>&);
+    std::vector<double> compute_errors(const std::vector<int>&, const std::vector<double>&);
+    double log_loss(const std::vector<int>&, const std::vector<double>&);
+    std::vector<double> compute_gradient(const std::vector<std::vector<double>>&, const std::vector<int>&, const std::vector<double>&);
     void gradient_descent(const std::vector<double>&, const double&);
 public:
     BinaryLogisticRegression() = default;
     std::vector<double> normalize(const std::vector<double>&);
     std::vector<std::vector<double>> normalize(const std::vector<std::vector<double>>&);
     void fit(const std::vector<std::vector<double>>&);
-    void train(const std::vector<std::vector<double>>&, const std::vector<double>&, double, double, int);
+    void train(const std::vector<std::vector<double>>&, const std::vector<int>&, double, double, int);
     std::vector<int> predict(const std::vector<std::vector<double>>&);
     void _params();
     ~BinaryLogisticRegression() = default;
