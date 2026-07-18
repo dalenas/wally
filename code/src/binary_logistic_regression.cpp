@@ -73,10 +73,59 @@ std::vector<double> BinaryLogisticRegression::z(const std::vector<std::vector<do
     return z;
 }
 
-double BinaryLogisticRegression::sigmoid(const std::vector<double>& x) {}
-std::vector<double> BinaryLogisticRegression::sigmoid(const std::vector<std::vector<double>>&) {}
+double BinaryLogisticRegression::sigmoid(const std::vector<double>& x) {
+    return 1 / (1 + exp(-z(x)));
+}
 
-std::vector<double> BinaryLogisticRegression::compute_errors(const std::vector<double>&, const std::vector<double>&) {}
-double BinaryLogisticRegression::log_loss(const std::vector<double>&, const std::vector<double>&) {}
-std::vector<double> BinaryLogisticRegression::compute_gradient(const std::vector<std::vector<double>>&, const std::vector<double>&, const std::vector<double>&) {}
-void BinaryLogisticRegression::gradient_descent(const std::vector<double>&, const double&) {}
+std::vector<double> BinaryLogisticRegression::sigmoid(const std::vector<std::vector<double>>& X) {
+    int points = X.size();
+
+    std::vector<double> sigmoid(points, 0);
+    for(int i = 0; i < points; ++i)
+        sigmoid[i] = this->sigmoid(X[i]);
+
+    return sigmoid;
+}
+
+std::vector<double> BinaryLogisticRegression::compute_errors(const std::vector<double>& y, const std::vector<double>& p) {
+    int points = y.size();
+
+    std::vector<double> errors(points, 0);
+    for(int i = 0; i < points; ++i)
+        errors[i] = p[i] - y[i];
+
+    return errors;
+}
+
+double BinaryLogisticRegression::log_loss(const std::vector<double>& y, const std::vector<double>& p) {
+    int points = y.size();
+
+    double loss = 0;
+    for(int i = 0; i < points; ++i)
+        loss += -y[i]*log(p[i]) - (1 - y[i])*log(1 - p[i]);
+    
+    return loss;
+}
+
+std::vector<double> BinaryLogisticRegression::compute_gradient(const std::vector<std::vector<double>>& X, const std::vector<double>& y, const std::vector<double>& p) {
+    int points = X.size();
+    int parameters = weights.size();
+
+    std::vector<double> errors = compute_errors(y, p);
+    std::vector<double> gradient(parameters, 0);
+    for(int i = 0; i < points; ++i)
+        gradient[0] += errors[i];
+    for(int j = 1; j < parameters; ++j) {
+        for(int i = 0; i < points; ++i)
+            gradient[j] += errors[i]*X[i][j];
+    }
+
+    return gradient;
+}
+
+void BinaryLogisticRegression::gradient_descent(const std::vector<double>& gradient, const double& learning_rate) {
+    int parameters = gradient.size();
+
+    for(int j = 0; j < parameters; ++j)
+        weights[j] -= learning_rate*gradient[j];
+}
