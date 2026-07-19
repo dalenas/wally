@@ -178,6 +178,13 @@ std::vector<double> LogisticRegression::compute_gradient(const std::vector<doubl
     return gradient;
 }
 
+/*void LogisticRegression::gradient_descent(const std::vector<double>& gradient, const double& learning_rate) {
+    int parameters = weights.size();
+
+    for(int i = 0; i < parameters; ++i)
+        weights[i] -= learning_rate*gradient[i];
+}*/
+
 void LogisticRegression::fit(const std::vector<std::vector<double>>& X, const std::vector<int>& y) {
     int classes = class_count(y);
     int parameters = X.size() + 1;

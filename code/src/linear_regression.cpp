@@ -136,6 +136,7 @@ std::vector<std::vector<double>> LinearRegression::normalize(const std::vector<s
     std::vector<double> std_devs = standard_deviation(X);
     std::vector<std::vector<double>> X_norm(points, std::vector<double>(dimension, 0));
     for(int i = 0; i < dimension; ++i) {
+        std::cout << "Feature #" << i+1 << ": Mean = " << avgs[i] << ", STD DEV = " << std_devs[i] << std::endl;
         for(int point = 0; point < points; ++point)
             X_norm[point][i] = (X[point][i] - avgs[i]) / std_devs[i];
     }
@@ -149,6 +150,7 @@ std::vector<double> LinearRegression::normalize(const std::vector<double>& x) {
     double avg = mean(x);
     double std_dev = standard_deviation(x);
     std::vector<double> x_norm(points, 0);
+    std::cout << "Target: Mean = " << avg << ", STD DEV = " << std_dev << std::endl;
     for(int point = 0; point < points; ++point)
         x_norm[point] = (x[point] - avg) / std_dev;
 
