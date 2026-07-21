@@ -1,59 +1,59 @@
 #include "../lib/polynomial_regression.h"
 
-PolynomialRegression::PolynomialRegression(const int& d)
+PolynomialRegression::PolynomialRegression(const unsigned int& d)
     : degree(d) {};
 
-int PolynomialRegression::num_features(const int& dimension) {
-    int features = 0;
-    for(int k = 1; k <= degree; ++k) {
-        int n = dimension + k - 1;
+std::size_t PolynomialRegression::count_features(const unsigned int& dimension) {
+    std::size_t features = 0;
+    for(unsigned int k = 1; k <= degree; ++k) {
+        unsigned int n = dimension + k - 1;
         features += choose(n, k);
     }
     return features;
 }
 
-int PolynomialRegression::choose(const int& n, const int& k) {
-    int n_choose_k = 1;
+unsigned int PolynomialRegression::choose(const unsigned int& n, const unsigned int& k) {
+    unsigned int n_choose_k = 1;
 
-    for(int n_div_k = k+1; n_div_k <= n; ++n_div_k)
+    for(unsigned int n_div_k = k + 1; n_div_k <= n; ++n_div_k)
         n_choose_k *= n_div_k;
-    for(int n_minus_k = n - k; n_minus_k > 1; --n_minus_k)
+    for(unsigned int n_minus_k = n - k; n_minus_k > 1; --n_minus_k)
         n_choose_k /= n_minus_k;
 
     return n_choose_k;
 }
 
-std::vector<std::vector<int>> PolynomialRegression::pascal_matrix(const int& rows, const int& cols) {
-    std::vector<std::vector<int>> pascal_matrix(rows, std::vector<int>(cols, 0));
-    for(int row = 0; row < rows; ++row) {
-        for(int col = 0; col < cols; ++col) {
-            int n = cols + row - col;
-            int k = cols - col - 1;
+matrix<unsigned int> PolynomialRegression::pascal_matrix(const std::size_t& rows, const std::size_t& cols) {
+    matrix<unsigned int> pascal_matrix(rows, vector<unsigned int>(cols, 0));
+    for(std::size_t row = 0; row < rows; ++row) {
+        for(std::size_t col = 0; col < cols; ++col) {
+            unsigned int n = cols + row - col;
+            unsigned int k = cols - col - 1;
             pascal_matrix[row][col] = k > col + 1 ? choose(n, k) : choose(n, row + 1);
         }
     }
     return pascal_matrix;
 }
 
-std::vector<std::vector<double>> PolynomialRegression::transform(const std::vector<std::vector<double>>& X) {
-    int points = X.size();
-    int dimension = X[0].size();
-    int features = num_features(dimension);
+matrix<double> PolynomialRegression::transform(const matrix<double>& X) {
+    std::size_t points = X.size();
+    unsigned int dimension = X[0].size();
+    std::size_t features = count_features(dimension);
 
-    std::vector<std::vector<int>> P = pascal_matrix(degree-1, dimension);
-    std::vector<std::vector<double>> X_transform(points, std::vector<double>(features, 0));
-    for(int i = 0; i < dimension; ++i) {
-        for(int point = 0; point < points; ++point)
-            X_transform[point][i] = X[point][i];
+    matrix<unsigned int> P = pascal_matrix(degree-1, dimension);
+    matrix<double> transform(points, vector<double>(features, 0));
+    for(std::size_t i = 0; i < dimension; ++i) {
+        for(std::size_t point = 0; point < points; ++point)
+            transform[point][i] = X[point][i];
     }
-    int row = 0, col = 0, counter = 0;
-    int pascal_offset = P[row][col];
-    for(int feature = dimension; feature < features; ++feature) {
-        int base_feature = col;
-        int inductive_feature = feature - pascal_offset;
+    std::size_t row = 0, col = 0, counter = 0;
+    unsigned int pascal_offset = P[row][col];
+    for(std::size_t feature = dimension; feature < features; ++feature) {
+        std::size_t base_feature = col;
+        std::size_t inductive_feature = feature - pascal_offset;
 
-        for(int point = 0; point < points; ++point)
-            X_transform[point][feature] = X_transform[point][base_feature]*X_transform[point][inductive_feature];
+        for(std::size_t point = 0; point < points; ++point)
+            transform[point][feature] = transform[point][base_feature]*transform[point][inductive_feature];
 
         ++counter;
         if(counter == P[row][col]) {
@@ -67,5 +67,5 @@ std::vector<std::vector<double>> PolynomialRegression::transform(const std::vect
             }
         }
     }
-    return X_transform;
+    return transform;
 }
