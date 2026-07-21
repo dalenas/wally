@@ -51,6 +51,7 @@ void LinearRegression::fit(const matrix<double>& X) {
 }
 
 void LinearRegression::train(const matrix<double>& X, const vector<double>& y, const double& learning_rate, const double& tol, const std::size_t& max_iter) {
+    fit(X);
     for(std::size_t step = 0; step < max_iter; ++step) {
         vector<double> y_pred = predict(X);
         vector<double> y_error = errors(y_pred, y);
