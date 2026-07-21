@@ -44,7 +44,7 @@ public:
 
 class Classifier {
 private:
-    virtual void fit(const matrix<double>&, const vector<int>&) = 0;
+    virtual void fit(const matrix<double>&) = 0;
 public:
     Classifier() = default;
     virtual void train(const matrix<double>&, const vector<int>&, const double&, const double&, const std::size_t&) = 0;

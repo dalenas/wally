@@ -4,9 +4,9 @@ PolynomialRegression::PolynomialRegression(const unsigned int& d)
     : degree(d) {};
 
 std::size_t PolynomialRegression::count_features(const unsigned int& dimension) {
-    int features = 0;
-    for(int k = 1; k <= degree; ++k) {
-        int n = dimension + k - 1;
+    std::size_t features = 0;
+    for(unsigned int k = 1; k <= degree; ++k) {
+        unsigned int n = dimension + k - 1;
         features += choose(n, k);
     }
     return features;

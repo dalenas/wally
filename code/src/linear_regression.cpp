@@ -39,7 +39,7 @@ vector<double> LinearRegression::compute_gradient(const vector<double>& errors, 
 }
 
 void LinearRegression::gradient_descent(const vector<double>& gradient, const double& learning_rate) {
-    int parameters = weights.size();
+    std::size_t parameters = weights.size();
 
     for(std::size_t i = 0; i < parameters; ++i)
         weights[i] -= learning_rate*gradient[i];

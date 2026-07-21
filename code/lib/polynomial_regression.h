@@ -1,3 +1,6 @@
+#ifndef POLYNOMIAL_REGRESSION_H
+#define POLYNOMIAL_REGRESSION_H
+
 #include "linear_regression.h"
 
 class PolynomialRegression : public LinearRegression {
@@ -12,3 +15,5 @@ public:
     matrix<double> transform(const matrix<double>&);
     ~PolynomialRegression() = default;
 };
+
+#endif
