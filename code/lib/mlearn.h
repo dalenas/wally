@@ -5,6 +5,8 @@
 #include <iostream>
 #include <vector>
 
+constexpr std::size_t BIAS = 0;
+
 using std::vector;
 template <typename T>
 using matrix = vector<vector<T>>;
