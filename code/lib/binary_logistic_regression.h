@@ -3,32 +3,25 @@
 
 #include "mlearn.h"
 
-class BinaryLogisticRegression {
+class BinaryLogisticRegression : public Classifier {
 private:
-    std::vector<double> weights;
+    vector<double> weights;
 
-    double mean(const std::vector<double>&);
-    std::vector<double> mean(const std::vector<std::vector<double>>&);
-    double standard_deviation(const std::vector<double>&);
-    std::vector<double> standard_deviation(const std::vector<std::vector<double>>&);
+    double z(const vector<double>&);
+    double sigmoid(const vector<double>&);
+    vector<double> sigmoid(const matrix<double>&);
 
-    double z(const std::vector<double>&);
-    std::vector<double> z(const std::vector<std::vector<double>>&);
-    double sigmoid(const std::vector<double>&);
-    std::vector<double> sigmoid(const std::vector<std::vector<double>>&);
+    vector<double> compute_errors(const vector<int>&, const vector<double>&);
+    double log_loss(const vector<int>&, const vector<double>&);
+    vector<double> compute_gradient(const matrix<double>&, const vector<int>&, const vector<double>&);
+    void gradient_descent(const vector<double>&, const double&);
 
-    std::vector<double> compute_errors(const std::vector<int>&, const std::vector<double>&);
-    double log_loss(const std::vector<int>&, const std::vector<double>&);
-    std::vector<double> compute_gradient(const std::vector<std::vector<double>>&, const std::vector<int>&, const std::vector<double>&);
-    void gradient_descent(const std::vector<double>&, const double&);
+    virtual void fit(const matrix<double>&, const vector<int>&) override;
 public:
     BinaryLogisticRegression() = default;
-    std::vector<double> normalize(const std::vector<double>&);
-    std::vector<std::vector<double>> normalize(const std::vector<std::vector<double>>&);
-    void fit(const std::vector<std::vector<double>>&);
-    void train(const std::vector<std::vector<double>>&, const std::vector<int>&, double, double, int);
-    std::vector<int> predict(const std::vector<std::vector<double>>&);
-    void _params();
+    virtual void train(const matrix<double>&, const vector<int>&, const double&, const double&, const std::size_t&) override;
+    virtual vector<int> predict(const matrix<double>&) override;
+    virtual void _params() override;
     ~BinaryLogisticRegression() = default;
 };
 
