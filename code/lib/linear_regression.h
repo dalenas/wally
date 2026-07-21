@@ -3,27 +3,22 @@
 
 #include "mlearn.h"
 
-constexpr int BIAS = 0;
-
-class LinearRegression {
+class LinearRegression : public Regressor {
 private:
-    std::vector<double> compute_gradient(const std::vector<double>&, const std::vector<std::vector<double>>&);
-    void gradient_descent(const std::vector<double>&, const double&);
-    std::vector<double> errors(const std::vector<double>&, const std::vector<double>&);
-    double mean_squared_error(const std::vector<double>&);
-    std::vector<double> mean(const std::vector<std::vector<double>>&);
-    double mean(const std::vector<double>&);
-    std::vector<double> standard_deviation(const std::vector<std::vector<double>>&);
-    double standard_deviation(const std::vector<double>&);
+    vector<double> compute_gradient(const vector<double>&, const matrix<double>&);
+    void gradient_descent(const vector<double>&, const double&);
+    vector<double> errors(const vector<double>&, const vector<double>&);
+    double mse_loss(const vector<double>&);
+
+    virtual void fit(const matrix<double>&) override;
+
 protected:
-    std::vector<double> weights;
+    vector<double> weights;
+
 public:
     LinearRegression() = default;
-    void fit(const std::vector<std::vector<double>>&);
-    void train(const std::vector<std::vector<double>>&, const std::vector<double>&, double, double, int);
-    std::vector<double> predict(const std::vector<std::vector<double>>&);
-    std::vector<std::vector<double>> normalize(const std::vector<std::vector<double>>&);
-    std::vector<double> normalize(const std::vector<double>&);
+    virtual void train(const matrix<double>&, const vector<double>&, const double&, const double&, const std::size_t&) override;
+    virtual vector<double> predict(const matrix<double>&) override;
     void _params();
     ~LinearRegression() = default;
 };
