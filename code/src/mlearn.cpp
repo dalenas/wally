@@ -111,21 +111,21 @@ double Stats::stdd(const vector<double>& x) {
 vector<double> Stats::stdd(const matrix<int>& X) {
     std::size_t features = X[0].size();
 
-    vector<double> vars = var(X);
+    vector<double> std_devs = var(X);
     for(std::size_t j = 0; j < features; ++j)
-        vars[j] = sqrtf(vars[j]);
+        std_devs[j] = sqrtf(std_devs[j]);
 
-    return vars;
+    return std_devs;
 }
 
 vector<double> Stats::stdd(const matrix<double>& X) {
     std::size_t features = X[0].size();
 
-    vector<double> vars = var(X);
+    vector<double> std_devs = var(X);
     for(std::size_t j = 0; j < features; ++j)
-        vars[j] = sqrtf(vars[j]);
+        std_devs[j] = sqrtf(std_devs[j]);
 
-    return vars;
+    return std_devs;
 }
 
 vector<double> Stats::norm(const vector<double>& x) {
@@ -146,7 +146,7 @@ matrix<double> Stats::norm(const matrix<double>& X) {
 
     vector<double> avgs = mean(X);
     vector<double> std_devs = stdd(X);
-    vector<std::vector<double>> norms(points, vector<double>(features, 0));
+    matrix<double> norms(points, vector<double>(features, 0));
     for(std::size_t j = 0; j < features; ++j) {
         for(std::size_t i = 0; i < points; ++i)
             norms[i][j] = (X[i][j] - avgs[j]) / std_devs[j];
