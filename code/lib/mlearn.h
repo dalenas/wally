@@ -36,6 +36,7 @@ public:
     Regressor() = default;
     virtual void train(const matrix<double>&, const vector<double>&, const double&, const double&, const std::size_t&) = 0;
     virtual vector<double> predict(const matrix<double>&) = 0;
+    virtual void _params() = 0;
     ~Regressor() = default;
 };
 
@@ -46,6 +47,7 @@ public:
     Classifier() = default;
     virtual void train(const matrix<double>&, const vector<int>&, const double&, const double&, const std::size_t&) = 0;
     virtual vector<int> predict(const matrix<double>&) = 0;
+    virtual void _params() = 0;
     ~Classifier() = default;
 };
 
