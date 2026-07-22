@@ -101,3 +101,60 @@ void MultiLogisticRegression::gradient_descent(const matrix<double>& X, const ve
             weights[k][j] -= learning_rate*gradient[k][j];
     }
 }
+
+void MultiLogisticRegression::fit(const matrix<double>& X, const vector<int>& y) {
+    std::size_t points = X.size();
+    std::size_t parameters = X[0].size() + 1;
+
+    std::size_t classes = 0;
+    for(std::size_t i = 0; i < points; ++i)
+        if(y[i] >= classes) ++classes;
+    weights = matrix<double>(classes, vector<double>(parameters, 0));
+}
+
+void MultiLogisticRegression::train(const matrix<double>& X, const vector<int>& y, const double& learning_rate, const double& tol, const std::size_t& max_iter) {
+    fit(X, y);
+    for(std::size_t n = 0; n < max_iter; ++n) {
+        matrix<double> P = softmax(X);
+
+        if(abs(cross_entropy_loss(y, P)) < tol)
+            return;
+
+        matrix<double> gradient = compute_gradient(X, y, P);
+        gradient_descent(X, y, P, learning_rate);
+    }
+}
+
+vector<int> MultiLogisticRegression::predict(const matrix<double>& X) {
+    std::size_t points = X.size();
+    std::size_t classes = weights.size();
+
+    matrix<double> P = softmax(X);
+    vector<int> y_pred(points, 0);
+    for(std::size_t i = 0; i < points; ++i) {
+        int softmax_max = 0;
+        for(std::size_t k = 1; k < classes; ++k) {
+            if(P[i][k] > P[i][softmax_max]) {
+                softmax_max = k;
+                if(P[i][softmax_max] > 0.5) break;
+            }
+        }
+        y_pred[i] = softmax_max;
+    }
+
+    return y_pred;
+}
+
+void MultiLogisticRegression::_params() {
+    std::size_t classes = weights.size();
+    std::size_t parameters = weights[0].size();
+
+    std::cout << '[';
+    for(std::size_t k = 0; k < classes; ++k) {
+        std::cout << '[' << weights[k][BIAS];
+        for(std::size_t j = 1; j < parameters; ++j)
+            std::cout << ", " << weights[k][j];
+        std::cout << ']' << std::endl;
+    }
+    std::cout << ']' << std::endl;
+}

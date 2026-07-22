@@ -17,8 +17,7 @@ private:
     matrix<double> compute_gradient(const matrix<double>&, const vector<int>&, const matrix<double>&);
     void gradient_descent(const matrix<double>&, const vector<int>&, const matrix<double>&, const double&);
 
-    vector<int> enumerate(const vector<int>&);
-    virtual void fit(const matrix<double>&) override;
+    virtual void fit(const matrix<double>&, const vector<int>&) override;
 public:
     MultiLogisticRegression() = default;
     virtual void train(const matrix<double>&, const vector<int>&, const double&, const double&, const std::size_t&) override;
