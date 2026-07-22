@@ -11,11 +11,13 @@ private:
     vector<double> softmax(const vector<double>&);
     matrix<double> softmax(const matrix<double>&);
 
-    double cross_entropy_loss(const vector<int>&, const vector<double>&);
-    vector<double> compute_errors(const vector<double>&, const vector<double>&);
-    vector<double> compute_gradient(const matrix<double>&, const vector<double>&, const vector<double>&);
-    void gradient_descent(const matrix<double>&, const vector<double>&, const vector<double>&, const double&);
+    double cross_entropy_loss(const vector<int>&, const matrix<double>&);
+    vector<double> compute_errors(const int&, const vector<double>&);
+    matrix<double> compute_errors(const vector<int>&, const matrix<double>&);
+    matrix<double> compute_gradient(const matrix<double>&, const vector<int>&, const matrix<double>&);
+    void gradient_descent(const matrix<double>&, const vector<int>&, const matrix<double>&, const double&);
 
+    vector<int> enumerate(const vector<int>&);
     virtual void fit(const matrix<double>&) override;
 public:
     MultiLogisticRegression() = default;
