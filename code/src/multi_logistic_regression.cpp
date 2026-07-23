@@ -106,7 +106,7 @@ void MultiLogisticRegression::fit(const matrix<double>& X, const vector<int>& y)
     std::size_t points = X.size();
     std::size_t parameters = X[0].size() + 1;
 
-    std::size_t classes = 0;
+    int classes = 0;
     for(std::size_t i = 0; i < points; ++i)
         if(y[i] >= classes) ++classes;
     weights = matrix<double>(classes, vector<double>(parameters, 0));

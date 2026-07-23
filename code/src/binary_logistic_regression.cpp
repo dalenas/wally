@@ -69,7 +69,13 @@ void BinaryLogisticRegression::gradient_descent(const vector<double>& gradient, 
         weights[j] -= learning_rate*gradient[j];
 }
 
-void BinaryLogisticRegression::fit(const matrix<double>& X) {
+void BinaryLogisticRegression::fit(const matrix<double>& X, const vector<int>& y) {
+    std::size_t points = y.size();
+
+    int classes = 2;
+    for(std::size_t i = 0; i < points; ++i)
+        if(y[i] > classes) return;
+
     std::size_t parameters = X[0].size() + 1;
     weights = vector<double>(parameters, 0);
 }
@@ -86,7 +92,7 @@ vector<int> BinaryLogisticRegression::predict(const matrix<double>& X) {
 }
 
 void BinaryLogisticRegression::train(const matrix<double>& X, const vector<int>& y, const double& learning_rate, const double& tol, const std::size_t& max_iter) {
-    fit(X);
+    fit(X, y);
     for(std::size_t k = 0; k < max_iter; ++k) {
         vector<double> p = sigmoid(X);
 
