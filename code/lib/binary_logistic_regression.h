@@ -16,7 +16,7 @@ private:
     vector<double> compute_gradient(const matrix<double>&, const vector<int>&, const vector<double>&);
     void gradient_descent(const vector<double>&, const double&);
 
-    virtual void fit(const matrix<double>&) override;
+    virtual void fit(const matrix<double>&, const vector<int>&) override;
 public:
     BinaryLogisticRegression() = default;
     virtual void train(const matrix<double>&, const vector<int>&, const double&, const double&, const std::size_t&) override;
