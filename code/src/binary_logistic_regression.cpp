@@ -75,7 +75,6 @@ void BinaryLogisticRegression::fit(const matrix<double>& X, const vector<int>& y
     int classes = 2;
     for(std::size_t i = 0; i < points; ++i)
         if(y[i] > classes) return;
-
     std::size_t parameters = X[0].size() + 1;
     weights = vector<double>(parameters, 0);
 }

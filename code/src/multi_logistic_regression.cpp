@@ -50,9 +50,10 @@ double MultiLogisticRegression::cross_entropy_loss(const vector<int>& y, const m
 vector<double> MultiLogisticRegression::compute_errors(const int& y, const vector<double>& p) {
     std::size_t classes = p.size();
 
+    std::size_t y_t = y;
     vector<double> errors(classes, 0);
     for(std::size_t k = 0; k < classes; ++k)
-        errors[k] = y != k ? p[k] : p[k] - 1;
+        errors[k] = y_t != k ? p[k] : p[k] - 1;
 
     return errors;
 }
