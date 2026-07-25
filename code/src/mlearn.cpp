@@ -1,156 +1,72 @@
 #include "../lib/mlearn.h"
 
-double Stats::mean(const vector<int>& x) {
-    std::size_t points = x.size();
-
-    int total = 0;
-    for(std::size_t i = 0; i < points; ++i)
-        total += x[i];
-
-    return total / points;
+float Stats::mean(const VectorXi& x) {
+    return x.mean();
 }
 
-double Stats::mean(const vector<double>& x) {
-    std::size_t points = x.size();
-
-    double total = 0;
-    for(std::size_t i = 0; i < points; ++i)
-        total += x[i];
-
-    return total / points;
+float Stats::mean(const VectorXf& x) {
+    return x.mean();
 }
 
-vector<double> Stats::mean(const matrix<int>& X) {
-    std::size_t points = X.size();
-    std::size_t features = X[0].size();
+VectorXf Stats::mean(const MatrixXi& X) {
+    return X.colwise().mean();
+}
 
-    vector<double> avgs(features, 0);
-    for(std::size_t j = 0; j < features; ++j) {
-        for(std::size_t i = 0; i < points; ++i)
-            avgs[j] += X[i][j];
-        avgs[j] /= points;
+VectorXf Stats::mean(const MatrixXf& X) {
+    return X.colwise().mean();
+}
+
+float Stats::var(const VectorXi& x) {
+    return (x.array() - x.mean()).square().sum() / x.size();
+}
+
+float Stats::var(const VectorXf& x) {
+    return (x.array() - x.mean()).square().sum() / x.size();
+}
+
+VectorXf Stats::var(const MatrixXi& X) {
+    VectorXf vars(X.cols());
+    for(std::size_t i = 0; i < X.cols(); ++i) {
+        VectorXi x = X.col(i);
+        vars(i) = var(x);
     }
-
-    return avgs;
-}
-
-vector<double> Stats::mean(const matrix<double>& X) {
-    std::size_t points = X.size();
-    std::size_t features = X[0].size();
-
-    vector<double> avgs(features, 0);
-    for(std::size_t j = 0; j < features; ++j) {
-        for(std::size_t i = 0; i < points; ++i)
-            avgs[j] += X[i][j];
-        avgs[j] /= points;
-    }
-
-    return avgs;
-}
-
-double Stats::var(const vector<int>& x) {
-    std::size_t points = x.size();
-
-    double avg = mean(x);
-    double total = 0;
-    for(std::size_t i = 0; i < points; ++i)
-        total += pow(x[i] - avg, 2);
-    
-    return total / points;
-}
-
-double Stats::var(const vector<double>& x) {
-    std::size_t points = x.size();
-
-    double avg = mean(x);
-    double total = 0;
-    for(std::size_t i = 0; i < points; ++i)
-        total += pow(x[i] - avg, 2);
-    
-    return total / points;
-}
-
-vector<double> Stats::var(const matrix<int>& X) {
-    std::size_t points = X.size();
-    std::size_t features = X[0].size();
-
-    vector<double> avgs = mean(X);
-    vector<double> vars(features, 0);
-    for(std::size_t j = 0; j < features; ++j) {
-        for(std::size_t i = 0; i < points; ++i)
-            vars[j] += pow(X[i][j] - avgs[j], 2);
-        vars[j] /= points;
-    }
-    
     return vars;
 }
 
-vector<double> Stats::var(const matrix<double>& X) {
-    std::size_t points = X.size();
-    std::size_t features = X[0].size();
-
-    vector<double> avgs = mean(X);
-    vector<double> vars(features, 0);
-    for(std::size_t j = 0; j < features; ++j) {
-        for(std::size_t i = 0; i < points; ++i)
-            vars[j] += pow(X[i][j] - avgs[j], 2);
-        vars[j] /= points;
+VectorXf Stats::var(const MatrixXf& X) {
+    VectorXf vars(X.cols());
+    for(std::size_t i = 0; i < X.cols(); ++i) {
+        VectorXf x = X.col(i);
+        vars(i) = var(x);
     }
-    
     return vars;
 }
 
-double Stats::stdd(const vector<int>& x) {
+float Stats::stdd(const VectorXi& x) {
     return sqrtf(var(x));
 }
 
-double Stats::stdd(const vector<double>& x) {
+float Stats::stdd(const VectorXf& x) {
     return sqrtf(var(x));
 }
 
-vector<double> Stats::stdd(const matrix<int>& X) {
-    std::size_t features = X[0].size();
-
-    vector<double> std_devs = var(X);
-    for(std::size_t j = 0; j < features; ++j)
-        std_devs[j] = sqrtf(std_devs[j]);
-
-    return std_devs;
+VectorXf Stats::stdd(const MatrixXi& X) {
+    return var(X).array().sqrt().matrix();
 }
 
-vector<double> Stats::stdd(const matrix<double>& X) {
-    std::size_t features = X[0].size();
-
-    vector<double> std_devs = var(X);
-    for(std::size_t j = 0; j < features; ++j)
-        std_devs[j] = sqrtf(std_devs[j]);
-
-    return std_devs;
+VectorXf Stats::stdd(const MatrixXf& X) {
+    return var(X).array().sqrt().matrix();
 }
 
-vector<double> Stats::norm(const vector<double>& x) {
-    std::size_t points = x.size();
-
-    double avg = mean(x);
-    double std_dev = stdd(x);
-    vector<double> norm(points, 0);
-    for(std::size_t i = 0; i < points; ++i)
-        norm[i] = (x[i] - avg) / std_dev;
-
-    return norm;
+VectorXf Stats::norm(const VectorXf& x) {
+    return ((x.array() - x.mean()) / stdd(x)).matrix();
 }
 
-matrix<double> Stats::norm(const matrix<double>& X) {
-    std::size_t points = X.size();
-    std::size_t features =  X[0].size();
-
-    vector<double> avgs = mean(X);
-    vector<double> std_devs = stdd(X);
-    matrix<double> norms(points, vector<double>(features, 0));
-    for(std::size_t j = 0; j < features; ++j) {
-        for(std::size_t i = 0; i < points; ++i)
-            norms[i][j] = (X[i][j] - avgs[j]) / std_devs[j];
+MatrixXf Stats::norm(const MatrixXf& X) {
+    MatrixXf norms(X.rows(), X.cols());
+    for(std::size_t i = 0; i < X.cols(); ++i) {
+        VectorXf x = X.col(i);
+        norms.col(i) = norm(x);
     }
-
     return norms;
 }
