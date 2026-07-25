@@ -2,58 +2,53 @@
 #define MLEARN_H
 
 #include <cmath>
-#include <Eigen/Dense>
 #include <iostream>
 #include <vector>
 
 constexpr std::size_t BIAS = 0;
 
-using Eigen::VectorXi;
-using Eigen::VectorXf;
-using Eigen::MatrixXi;
-using Eigen::MatrixXf;
 using std::vector;
 template <typename T>
 using matrix = vector<vector<T>>;
 
 namespace Stats {
-    float mean(const VectorXi&);
-    float mean(const VectorXf&);
-    VectorXf mean(const MatrixXi&);
-    VectorXf mean(const MatrixXf&);
+    double mean(const vector<int>&);
+    double mean(const vector<double>&);
+    vector<double> mean(const matrix<int>&);
+    vector<double> mean(const matrix<double>&);
 
-    float var(const VectorXi&);
-    float var(const VectorXf&);
-    VectorXf var(const MatrixXi&);
-    VectorXf var(const MatrixXf&);
+    double var(const vector<int>&);
+    double var(const vector<double>&);
+    vector<double> var(const matrix<int>&);
+    vector<double> var(const matrix<double>&);
 
-    float stdd(const VectorXi&);
-    float stdd(const VectorXf&);
-    VectorXf stdd(const MatrixXi&);
-    VectorXf stdd(const MatrixXf&);
+    double stdd(const vector<int>&);
+    double stdd(const vector<double>&);
+    vector<double> stdd(const matrix<int>&);
+    vector<double> stdd(const matrix<double>&);
 
-    VectorXf norm(const VectorXf&);
-    MatrixXf norm(const MatrixXf&);
+    vector<double> norm(const vector<double>&);
+    matrix<double> norm(const matrix<double>&);
 };
 
 class Regressor {
 private:
-    virtual void fit(const MatrixXf&) = 0;
+    virtual void fit(const matrix<double>&) = 0;
 public:
     Regressor() = default;
-    virtual void train(const MatrixXf&, const VectorXf&, const double&, const double&, const std::size_t&) = 0;
-    virtual VectorXf predict(const MatrixXf&) = 0;
+    virtual void train(const matrix<double>&, const vector<double>&, const double&, const double&, const std::size_t&) = 0;
+    virtual vector<double> predict(const matrix<double>&) = 0;
     virtual void _params() = 0;
     ~Regressor() = default;
 };
 
 class Classifier {
 private:
-    virtual void fit(const MatrixXf&, const VectorXi&) = 0;
+    virtual void fit(const matrix<double>&, const vector<int>&) = 0;
 public:
     Classifier() = default;
-    virtual void train(const MatrixXf&, const VectorXi&, const double&, const double&, const std::size_t&) = 0;
-    virtual VectorXi predict(const MatrixXf&) = 0;
+    virtual void train(const matrix<double>&, const vector<int>&, const double&, const double&, const std::size_t&) = 0;
+    virtual vector<int> predict(const matrix<double>&) = 0;
     virtual void _params() = 0;
     ~Classifier() = default;
 };
