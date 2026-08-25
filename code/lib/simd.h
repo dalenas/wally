@@ -25,16 +25,18 @@ namespace SIMD {
         float _mm256_sum_ps(__m256 a);
     }
 
-    void zero(Matrix&);
+    void setzero(Matrix&);
     
     float sum(const Matrix&);
     float dot(const Matrix&);
 
     void add(const Matrix&, const Matrix&, Matrix&);
-    void sub(const Matrix&, const Matrix&, Matrix&);
+    void sub(const Matrix&, const Matrix&, Matrix&);                    // used for error calculation
     void mul(float, const Matrix&, Matrix&);
     void mul(const Matrix&, const Matrix&, Matrix&);
+    void comp_div(Matrix&, float);                                      // used for averaging
 
+    float square_sum(const Matrix&);                                    // used for mse calculation
     void mult_sum();
 
     void mult_comp_add(Matrix&, float, const Matrix&);
@@ -42,7 +44,7 @@ namespace SIMD {
     void cross_mul_byrow(const Matrix&, const Matrix&, Matrix&);        // used for prediction when #features << #classes => #rows << #cols
     void cross_mul_to_N(const Matrix&, const Matrix&, Matrix&);         // used for prediction on regression models
     void cross_mul_to_M(const Matrix&, const Matrix&, Matrix&);         // used for gradient since error vector is 1d
-    void mult_comp_sub(Matrix&, float, const Matrix&);
+    void mult_comp_sub(Matrix&, float, const Matrix&);                  // used for gradient descent
 }
 
 #endif

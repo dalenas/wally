@@ -20,6 +20,29 @@ float SIMD::SIMD_::_mm256_sum_ps(__m256 a) {
     return _mm_cvtss_f32(sum_128);
 }
 
+void SIMD::comp_div(Matrix& Y, float k) {
+    float* const y = Y.data();
+
+    size_t N = Y.size();
+    size_t remainder = N % 8;
+
+    size_t i = 0;
+    __m256 div_vec = _mm256_set1_ps(k);
+    for(; i + 8 <= N; i += 8) {
+        __m256 y_vec = _mm256_loadu_ps(y + i);
+        y_vec = _mm256_div_ps(y_vec, div_vec);
+
+        _mm256_storeu_ps(y + i, y_vec);
+    }
+
+    if(remainder != 0) {
+        __m256 y_vec = SIMD_::load_k(y + i, remainder);
+        y_vec = _mm256_div_ps(y_vec, div_vec);
+
+        SIMD_::store_k(y + i, y_vec, remainder);
+    }
+}
+
 float SIMD::sum(const Matrix& X) {
     const float* const x = X.data();
 
@@ -118,6 +141,32 @@ void SIMD::mul(const Matrix& A, const Matrix& B, Matrix& Y) {
         y[r] = a[r] * b[r];
 }
 
+float SIMD::square_sum(const Matrix& A) {
+    const float* const a = A.data();
+
+    size_t N = A.size();
+    size_t remainder = N % 8;
+
+    size_t i = 0;
+    __m256 sum_vec = _mm256_setzero_ps();
+    __m256 pow_vec = _mm256_set1_ps(2);
+    for(; i + 8 <= N; i += 8) {
+        __m256 a_vec = _mm256_loadu_ps(a + i);
+        __m256 y_vec = _mm256_pow_ps(a_vec, pow_vec);
+
+        sum_vec = _mm256_add_ps(a_vec, sum_vec);
+    }
+
+    if(remainder != 0) {
+        __m256 a_vec = SIMD_::load_k(a + i, remainder);
+        __m256 y_vec = _mm256_pow_ps(a_vec, pow_vec);
+
+        sum_vec = _mm256_add_ps(y_vec, sum_vec);
+    }
+
+    return SIMD_::_mm256_sum_ps(sum_vec);
+}
+
 void SIMD::mult_comp_add(Matrix& Y, float k, const Matrix& A) {
     const float* const a = A.data();
     float* const y = Y.data();
@@ -138,7 +187,7 @@ void SIMD::mult_comp_add(Matrix& Y, float k, const Matrix& A) {
         y[r] += k * a[r];
 }
 
-void SIMD::zero(Matrix& Y) {
+void SIMD::setzero(Matrix& Y) {
     float* const y = Y.data();
     
     const size_t N = Y.size();
@@ -153,7 +202,7 @@ void SIMD::zero(Matrix& Y) {
 }
 
 void SIMD::cross_mul_byrow(const Matrix& A, const Matrix& B, Matrix& Y) {
-    zero(Y);
+    setzero(Y);
 
     const float* const a = A.data();
     const float* const b = B.data();
@@ -192,7 +241,7 @@ void SIMD::cross_mul_byrow(const Matrix& A, const Matrix& B, Matrix& Y) {
 }
 
 void SIMD::cross_mul_bycol(const Matrix& A, const Matrix& B, Matrix& Y) {
-    zero(Y);
+    setzero(Y);
 
     const float* const a = A.data();
     const float* const b = B.data();
@@ -234,7 +283,7 @@ void SIMD::cross_mul_bycol(const Matrix& A, const Matrix& B, Matrix& Y) {
 }
 
 void SIMD::cross_mul_to_N(const Matrix& A, const Matrix& B, Matrix& Y) {
-    zero(Y);
+    setzero(Y);
 
     const float* const a = A.data();
     const float* const b = B.data();
@@ -268,7 +317,7 @@ void SIMD::cross_mul_to_N(const Matrix& A, const Matrix& B, Matrix& Y) {
 }
 
 void SIMD::cross_mul_to_M(const Matrix& A, const Matrix& B, Matrix& Y) {
-    zero(Y);
+    setzero(Y);
 
     const float* const a = A.data();
     const float* const b = B.data();
