@@ -151,36 +151,86 @@ void mult_comp_add(Matrix& Y, float k, const Matrix& A) {
 
 // A is row major, B is column major
     // Predict per class
+    // for more features, less classes: dataset is row-major, weights are column-major
 void matrix_mul(Matrix& Y, const Matrix& A, const Matrix& B) {
     const float* const a = A.data();
     const float* const b = B.data();
     float* const y = Y.data();
 
-    size_t r = A.cols() % 8;                        // Remaining feature count that can't create a full __m256 object
-    for(size_t i = 0; i < A.rows(); ++i) {          // Per point
-        for(size_t k = 0; k < B.cols(); ++k) {      // Per class
-            size_t j = 0;
-            for(; j + 8 <= A.cols(); j += 8) {      // 8 features at a time
-                __m256 a_vec = _mm256_loadu_ps(a + i*A.cols() + j);     // load A(i, j) - A(i, j+7), or the ith datapoint's j-j+7 features
-                __m256 b_vec = _mm256_loadu_ps(b + k*B.rows() + j);     // load B(j, k) - B(j+7, k), or the kth class's j-j+7 weights
+    const size_t N = A.rows();
+    const size_t M = A.cols();
+    const size_t K = B.cols();
 
-                y[i*B.cols() + k] += SIMD_::_mm256_fmsum_ps(a_vec, b_vec);
+    size_t r = M % 8;                        // Remaining feature count that can't create a full __m256 object
+    for(size_t i = 0; i < N; ++i) {          // Per point
+        const float* a_row = a + i*M;
+
+        for(size_t k = 0; k < K; ++k) {      // Per class
+            const float* b_col = b + k*M;
+
+            size_t j = 0;
+            __m256 y_vec = _mm256_setzero_ps();
+            for(; j + 8 <= M; j += 8) {      // 8 features at a time
+                __m256 a_vec = _mm256_loadu_ps(a_row + j);     // load A(i, j) - A(i, j+7), or the ith datapoint's j-j+7 features
+                __m256 b_vec = _mm256_loadu_ps(b_col + j);     // load B(j, k) - B(j+7, k), or the kth class's j-j+7 weights
+
+                 y_vec = _mm256_fmadd_ps(a_vec, b_vec, y_vec);
             }
 
-            __m256 a_tail = SIMD_::load_k(a + i*A.cols() + j, r);
-            __m256 b_tail = SIMD_::load_k(b + k*B.rows() + j, r);
+            if(r != 0) {
+                __m256 a_vec = SIMD_::load_k(a_row + j, r);
+                __m256 b_vec = SIMD_::load_k(b_col + j, r);
 
-            y[i*B.cols() + k] += SIMD_::_mm256_fmsum_ps(a_tail, b_tail);
+                y_vec = _mm256_fmadd_ps(a_vec, b_vec, y_vec);
+            }
+
+            y[i*K + k] = SIMD_::_mm256_sum_ps(y_vec);
         }
     }
 }
 
 // mul2 is temporary name
     // Predict per feature
+    // weights matrix needs to be row-major
+    // so for less features, more classes: dataset and weight matrices are both row major
 void matrix_mul2(Matrix& Y, const Matrix& A, const Matrix& B) {
     const float* const a = A.data();
     const float* const b = B.data();
     float* const y = Y.data();
+
+    const size_t N = A.rows();
+    const size_t M = A.cols();
+    const size_t K = B.cols();
+
+    size_t r = B.cols() % 8;
+    for(size_t i = 0; i < N; ++i) {          // per point
+        const float* a_row = a + i*M;
+        float* y_row = y + i*K;
+
+        for(size_t j = 0; j < M; ++j) {      // per feature
+            const float* b_row = b + j*K;
+
+            size_t k = 0;
+            __m256 a_vec = _mm256_set1_ps(*(a_row + j));
+            for(; k + 8 <= K; k += 8) {      // 8 classes at a time
+                __m256 b_vec = _mm256_loadu_ps(b_row + k);
+                __m256 y_vec = _mm256_loadu_ps(y_row + k);
+                
+                y_vec = _mm256_fmadd_ps(a_vec, b_vec, y_vec);
+
+                _mm256_storeu_ps(y_row + k, y_vec);
+            }
+
+            if(r != 0) {
+                __m256 b_vec = SIMD_::load_k(b_row + k, r);
+                __m256 y_vec = SIMD_::load_k(y_row + k, r);
+
+                y_vec = _mm256_fmadd_ps(a_vec, b_vec, y_vec);
+
+                SIMD_::store_k(y_row + k, y_vec);         // Write store_k for this
+            }
+        }
+    }
 }
 
 void mult_comp_sub(Matrix&, float, const Matrix&) {
