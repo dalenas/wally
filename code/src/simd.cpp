@@ -141,6 +141,60 @@ void SIMD::mul(const Matrix& A, const Matrix& B, Matrix& Y) {
         y[r] = a[r] * b[r];
 }
 
+void SIMD::softmax(Matrix& Y) {
+    float* const y = Y.data();
+    
+    const size_t N = Y.rows();
+    const size_t K = Y.cols();
+
+    size_t remainder = K % 8;
+    for(size_t i = 0; i < N; ++i) {
+        float* const y_row = y + i*K;
+
+        // Calculate e^(z-max(z)) and accumulate for norm value
+        size_t k = 0;
+        __m256 norm_vec = _mm256_setzero_ps();
+        for(; k + 8 <= K; k += 8) {
+            __m256 y_vec = _mm256_loadu_ps(y_row + k);
+            __m256 exp_vec = _mm256_exp_ps(y_vec);              // may need to change a little since exp_ps is from a diff library
+
+            _mm256_storeu_ps(y_row + k, exp_vec);
+
+            norm_vec = _mm256_add_ps(exp_vec, norm_vec);
+        }
+
+        if(remainder != 0) {
+            __m256 y_vec = SIMD_::load_k(y_row + k, remainder);
+            __m256 exp_vec = _mm256_exp_ps(y_vec);
+
+            SIMD_::store_k(y_row + k, exp_vec, remainder);
+
+            norm_vec = _mm256_add_ps(exp_vec, norm_vec);
+        }
+
+        float norm = SIMD_::_mm256_sum_ps(norm_vec);
+        if(remainder != 0) norm -= static_cast<float>(8 - remainder);
+
+        // Normalize all e^(z-max(z)) for p and store
+        k = 0;
+        float inv_norm = 1.0f / norm;
+        __m256 inv_norm_vec = _mm256_set1_ps(inv_norm);
+        for(; k + 8 <= K; k += 8) {
+            __m256 y_vec = _mm256_loadu_ps(y_row + k);
+            y_vec = _mm256_mul_ps(y_vec, inv_norm_vec);
+
+            _mm256_storeu_ps(y_row + k, y_vec);
+        }
+
+        if(remainder != 0) {
+            __m256 y_vec = SIMD_::load_k(y_row + k, remainder);
+            y_vec = _mm256_mul_ps(y_vec, inv_norm_vec);
+
+            SIMD_::store_k(y_row + k, y_vec, remainder);
+        }
+    }
+}
+
 float SIMD::square_sum(const Matrix& A) {
     const float* const a = A.data();
 

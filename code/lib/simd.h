@@ -39,6 +39,12 @@ namespace SIMD {
     float square_sum(const Matrix&);                                    // used for mse calculation
     void mult_sum();
 
+    // softmax -> calculatecalculate e^z, sum e^z per point, normalize each e^z for p
+        // for e^z calculation:
+            // case 1: calculate 8 zs first, then do mm256_exp for 8 e^z
+            // case 2: calculate 8 e^xiwi at a time and use mm256_mul, then dot product to find e^z
+    void softmax(Matrix&);
+
     void mult_comp_add(Matrix&, float, const Matrix&);
     void cross_mul_bycol(const Matrix&, const Matrix&, Matrix&);        // used for prediction when #features >> #classes => #rows >> #cols
     void cross_mul_byrow(const Matrix&, const Matrix&, Matrix&);        // used for prediction when #features << #classes => #rows << #cols
