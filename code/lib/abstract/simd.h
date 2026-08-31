@@ -28,6 +28,7 @@ namespace Wally::Abstract::SIMD {
         float _mm256_sum_ps(__m256);                                  // intermediate sum function
         int _mm256_sum_ps(__m256i);
     }
+    constexpr std::size_t WIDTH = 8;
 
     template<typename Container>
     void setzero(Container&);
@@ -40,14 +41,14 @@ namespace Wally::Abstract::SIMD {
     template<typename T>
     T dot(const Vector<T>&, const Vector<T>&);
 
-    template<typename Container>
-    void add(const Container::element_type, const Container&, Container&);
-    template<typename Container>
-    void sub(const Container::element_type, const Container&, Container&);
-    template<typename Container>
-    void mul(const Container::element_type, const Container&, Container&);
-    template<typename Container>
-    void div(const Container::element_type, const Container&, Container&);
+    template<typename S, typename Container>
+    void add(const S, const Container&, Container&);
+    template<typename S, typename Container>
+    void sub(const S, const Container&, Container&);
+    template<typename S, typename Container>
+    void mul(const S, const Container&, Container&);
+    template<typename S, typename Container>
+    void div(const S, const Container&, Container&);
 
     template<typename Container>
     void add(const Container&, const Container&, Container&);
