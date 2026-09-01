@@ -19,45 +19,89 @@ namespace Wally::Abstract::SIMD {
             _mm256_setr_epi32(-1, -1, -1, -1, -1, -1, -1, -1)
         };
 
-        __m256 load_k(const float* const, std::size_t);                      // masked load for remainder calculations
-        __m256i load_k(const int* const, std::size_t);
+        __m256 _mm256_loadu(const float* const);
+        __m256i _mm256_loadu(const int* const);
 
-        void store_k(float*, __m256, std::size_t);                           // masked store for remainder calcs
-        void store_k(int*, __m256i, std::size_t);
+        __m256 _mm256_maskloadu(const float* const, std::size_t);                      // masked load for remainder calculations
+        __m256i _mm256_maskloadu(const int* const, std::size_t);
 
-        float _mm256_sum_ps(__m256);                                  // intermediate sum function
-        int _mm256_sum_ps(__m256i);
+        void _mm256_storeu(float*, __m256);
+        void _mm256_storeu(int*, __m256i);
+
+        void _mm256_maskstoreu(float*, __m256, std::size_t);                           // masked store for remainder calcs
+        void _mm256_maskstoreu(int*, __m256i, std::size_t);
+
+        __m256 _mm256_set1(float);
+        __m256 _mm256_set1(int);
+
+        __m256 _mm256_add(__m256, __m256);
+        __m256 _mm256_add(__m256, __m256i);
+        __m256 _mm256_add(__m256i, __m256);
+        __m256i _mm256_add(__m256i, __m256i);
+
+        __m256 _mm256_sub(__m256, __m256);
+        __m256 _mm256_sub(__m256, __m256i);
+        __m256 _mm256_sub(__m256i, __m256);
+        __m256i _mm256_sub(__m256i, __m256i);
+
+        __m256 _mm256_mul(__m256, __m256);
+        __m256 _mm256_mul(__m256, __m256i);
+        __m256 _mm256_mul(__m256i, __m256);
+        __m256i _mm256_mul(__m256i, __m256i);
+
+        __m256 _mm256_div(__m256, __m256);
+        __m256 _mm256_div(__m256, __m256i);
+        __m256 _mm256_div(__m256i, __m256);
+        __m256 _mm256_div(__m256i, __m256i);
     }
     constexpr std::size_t WIDTH = 8;
 
-    template<typename Container>
-    void setzero(Container&);
+    // Sets every element in the container to 0
+    template<typename ContainerY>
+    void setzero(ContainerY&);
 
     template<typename Container>
-    Container::element_type sum(const Container&);
+    float sum(const Container&);
 
     template<typename T>
     void sum(const Matrix<T>&, Vector<T>&);
     template<typename T>
     T dot(const Vector<T>&, const Vector<T>&);
+    
+    // Scalar broadcast operations
+    template<typename S, typename ContainerA, typename ContainerY>
+    void add(const S, const ContainerA&, ContainerY&);
+    template<typename S, typename ContainerA, typename ContainerY>
+    void sub(const S, const ContainerA&, ContainerY&);
+    template<typename ContainerA, typename S, typename ContainerY>
+    void sub(const ContainerA&, const S, ContainerY&);
+    template<typename S, typename ContainerA, typename ContainerY>
+    void mul(const S, const ContainerA&, ContainerY&);
+    template<typename S, typename ContainerA, typename ContainerY>
+    void div(const S, const ContainerA&, ContainerY&);
+    template<typename ContainerA, typename S, typename ContainerY>
+    void div(const ContainerA&, const S, ContainerY&);
 
-    template<typename S, typename Container>
-    void add(const S, const Container&, Container&);
-    template<typename S, typename Container>
-    void sub(const S, const Container&, Container&);
-    template<typename S, typename Container>
-    void mul(const S, const Container&, Container&);
-    template<typename S, typename Container>
-    void div(const S, const Container&, Container&);
+    // Element-wise operations
+    template<typename ContainerA, typename ContainerB, typename ContainerY>
+    void add(const ContainerA&, const ContainerB&, ContainerY&);
+    template<typename ContainerA, typename ContainerB, typename ContainerY>
+    void sub(const ContainerA&, const ContainerB&, ContainerY&);
+    template<typename ContainerA, typename ContainerB, typename ContainerY>
+    void mul(const ContainerA&, const ContainerB&, ContainerY&);
+    template<typename ContainerA, typename ContainerB, typename ContainerY>
+    void div(const ContainerA&, const ContainerB&, ContainerY&);
 
-    template<typename Container>
-    void add(const Container&, const Container&, Container&);
-    template<typename Container>
-    void sub(const Container&, const Container&, Container&);
-    template<typename Container>
-    void mul(const Container&, const Container&, Container&);
-    template<typename Container>
-    void div(const Container&, const Container&, Container&);
+    // Compound scalar operations
+    template<typename ContainerY, typename S>
+    void add(ContainerY&, const S);
+    template<typename ContainerY, typename S>
+    void sub(ContainerY&, const S);
+    template<typename ContainerY, typename S>
+    void mul(ContainerY&, const S);
+    template<typename ContainerY, typename S>
+    void div(ContainerY&, const S);
+
 
      
 
