@@ -431,6 +431,110 @@ void div(const ContainerA&, const ContainerB&, ContainerY&) {
     } // need to add matrix / vector, vector / matrix 
 }
 
+template<typename ContainerY, typename S>
+void add(ContainerY& Y, const S k) {
+    using U = typename container_type<ContainerY>::element_type;
+
+    U* const y = Y.data();
+    const std::size_t N = Y.size();
+    const std::size_t REMAINDER = N % WIDTH;
+    const std::size_t EDGE = N - REMAINDER;
+
+    std::size_t i = 0;
+    const auto k_vec = SIMD_::_mm256_set1(k);
+    for(; i < EDGE; i += 8) {
+        auto y_vec = SIMD_::_mm256_loadu(y + i);
+        y_vec = SIMD_::_mm256_add(y_vec, k_vec);
+
+        SIMD_::_mm256_storeu(y + i, y_vec);
+    }
+
+    if(REMAINDER != 0) {
+        auto y_vec = SIMD_::_mm256_maskloadu(y + i, REMAINDER);
+        y_vec = SIMD_::_mm256_add(y_vec, k_vec);
+
+        SIMD_::_mm256_maskstoreu(y + i, y_vec, REMAINDER);
+    }
+}
+
+template<typename ContainerY, typename S>
+void sub(ContainerY&, const S) {
+    using U = typename container_type<ContainerY>::element_type;
+
+    U* const y = Y.data();
+    const std::size_t N = Y.size();
+    const std::size_t REMAINDER = N % WIDTH;
+    const std::size_t EDGE = N - REMAINDER;
+
+    std::size_t i = 0;
+    const auto k_vec = SIMD_::_mm256_set1(k);
+    for(; i < EDGE; i += 8) {
+        auto y_vec = SIMD_::_mm256_loadu(y + i);
+        y_vec = SIMD_::_mm256_sub(y_vec, k_vec);
+
+        SIMD_::_mm256_storeu(y + i, y_vec);
+    }
+
+    if(REMAINDER != 0) {
+        auto y_vec = SIMD_::_mm256_maskloadu(y + i, REMAINDER);
+        y_vec = SIMD_::_mm256_sub(y_vec, k_vec);
+
+        SIMD_::_mm256_maskstoreu(y + i, y_vec, REMAINDER);
+    }
+}
+
+template<typename ContainerY, typename S>
+void mul(ContainerY&, const S) {
+    using U = typename container_type<ContainerY>::element_type;
+
+    U* const y = Y.data();
+    const std::size_t N = Y.size();
+    const std::size_t REMAINDER = N % WIDTH;
+    const std::size_t EDGE = N - REMAINDER;
+
+    std::size_t i = 0;
+    const auto k_vec = SIMD_::_mm256_set1(k);
+    for(; i < EDGE; i += 8) {
+        auto y_vec = SIMD_::_mm256_loadu(y + i);
+        y_vec = SIMD_::_mm256_mul(y_vec, k_vec);
+
+        SIMD_::_mm256_storeu(y + i, y_vec);
+    }
+
+    if(REMAINDER != 0) {
+        auto y_vec = SIMD_::_mm256_maskloadu(y + i, REMAINDER);
+        y_vec = SIMD_::_mm256_mul(y_vec, k_vec);
+
+        SIMD_::_mm256_maskstoreu(y + i, y_vec, REMAINDER);
+    }
+}
+
+template<typename ContainerY, typename S>
+void div(ContainerY&, const S) {
+    using U = typename container_type<ContainerY>::element_type;
+
+    U* const y = Y.data();
+    const std::size_t N = Y.size();
+    const std::size_t REMAINDER = N % WIDTH;
+    const std::size_t EDGE = N - REMAINDER;
+
+    std::size_t i = 0;
+    const auto k_vec = SIMD_::_mm256_set1(k);
+    for(; i < EDGE; i += 8) {
+        auto y_vec = SIMD_::_mm256_loadu(y + i);
+        y_vec = SIMD_::_mm256_div(y_vec, k_vec);
+
+        SIMD_::_mm256_storeu(y + i, y_vec);
+    }
+
+    if(REMAINDER != 0) {
+        auto y_vec = SIMD_::_mm256_maskloadu(y + i, REMAINDER);
+        y_vec = SIMD_::_mm256_div(y_vec, k_vec);
+
+        SIMD_::_mm256_maskstoreu(y + i, y_vec, REMAINDER);
+    }
+}
+
 
 
 
