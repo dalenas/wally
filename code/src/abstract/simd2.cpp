@@ -16,7 +16,7 @@ void SIMD::SIMD_::_mm256_maskstoreu(float* addr, __m256 a, std::size_t k) { _mm2
 void SIMD::SIMD_::_mm256_maskstoreu(int* addr, __m256i a, std::size_t k) { _mm256_maskstore_epi32(addr, masks[k], a); }
 
 __m256 SIMD::SIMD_::_mm256_set1(float k) { return _mm256_set1_ps(k); }
-__m256 SIMD::SIMD_::_mm256_set1(int k) { return _mm256_set1_ps(static_cast<float>(k)); }
+__m256 SIMD::SIMD_::_mm256_set1(int k) { return _mm256_set1_ps(static_cast<float>(k)); }            // may want to change to m256i, which would require if constexpr conditions in scalar operations
 
 __m256 SIMD::SIMD_::_mm256_add(const __m256 a, const __m256 b) { return _mm256_add_ps(a, b); }
 __m256 SIMD::SIMD_::_mm256_add(__m256 a, __m256i b) { 
@@ -29,14 +29,14 @@ __m256 SIMD::SIMD_::_mm256_add(__m256i a, __m256 b) {
 }
 __m256i SIMD::SIMD_::_mm256_add(__m256i a, __m256i b) { return _mm256_add_epi32(a, b); }
 
-__m256 SIMD::SIMD_::_mm256_sub(__m256 a, __m256 b) { return _mm256_add_ps(a, b); }
+__m256 SIMD::SIMD_::_mm256_sub(__m256 a, __m256 b) { return _mm256_sub_ps(a, b); }
 __m256 SIMD::SIMD_::_mm256_sub(__m256 a, __m256i b) {
     __m256 bf = _mm256_cvtepi32_ps(b);
     return _mm256_sub_ps(a, bf);
 }
 __m256 SIMD::SIMD_::_mm256_sub(__m256i a, __m256 b) {
     __m256 af = _mm256_cvtepi32_ps(a);
-    return _mm256_add_ps(af, b);
+    return _mm256_sub_ps(af, b);
 }
 __m256i SIMD::SIMD_::_mm256_sub(__m256i a, __m256i b) { return _mm256_sub_epi32(a, b); }
 
@@ -49,7 +49,7 @@ __m256 SIMD::SIMD_::_mm256_mul(__m256i a, __m256 b) {
     __m256 af = _mm256_cvtepi32_ps(a);
     return _mm256_mul_ps(af, b);
 }
-__m256i SIMD::SIMD_::_mm256_mul(__m256i a, __m256i b) { return _mm256_mul_epi32(a, b); }
+__m256i SIMD::SIMD_::_mm256_mul(__m256i a, __m256i b) { return _mm256_mullo_epi32(a, b); }
 
 __m256 SIMD::SIMD_::_mm256_div(__m256 a, __m256 b) { return _mm256_div_ps(a, b); }
 __m256 SIMD::SIMD_::_mm256_div(__m256 a, __m256i b) {
@@ -66,6 +66,90 @@ __m256 SIMD::SIMD_::_mm256_div(__m256i a, __m256i b) {
     return _mm256_div_ps(af, bf);
 }
 
+__m256 SIMD::SIMD_::_mm256_fmadd(__m256 a, __m256 b, __m256 c) { return _mm256_fmadd_ps(a, b, c); }
+
+__m256 SIMD::SIMD_::_mm256_fmadd(__m256 a, __m256 b, __m256i c) {
+    __m256 cf = _mm256_cvtepi32_ps(c);
+    return _mm256_fmadd_ps(a, b, cf);
+}
+
+__m256 SIMD::SIMD_::_mm256_fmadd(__m256 a, __m256i b, __m256 c) {
+    __m256 bf = _mm256_cvtepi32_ps(b);
+    return _mm256_fmadd_ps(a, bf, c);
+}
+
+__m256 SIMD::SIMD_::_mm256_fmadd(__m256 a, __m256i b, __m256i c) {
+    __m256 bf = _mm256_cvtepi32_ps(b);
+    __m256 cf = _mm256_cvtepi32_ps(c);
+    return _mm256_fmadd_ps(a, bf, cf);
+}
+
+__m256 SIMD::SIMD_::_mm256_fmadd(__m256i a, __m256 b, __m256 c) {
+    __m256 af = _mm256_cvtepi32_ps(a);
+    return _mm256_fmadd_ps(af, b, c);
+}
+
+__m256 SIMD::SIMD_::_mm256_fmadd(__m256i a, __m256 b, __m256i c) {
+    __m256 af = _mm256_cvtepi32_ps(a);
+    __m256 cf = _mm256_cvtepi32_ps(c);
+    return _mm256_fmadd_ps(af, b, cf);
+}
+
+__m256 SIMD::SIMD_::_mm256_fmadd(__m256i a, __m256i b, __m256 c) {
+    __m256 af = _mm256_cvtepi32_ps(a);
+    __m256 bf = _mm256_cvtepi32_ps(b);
+    return _mm256_fmadd_ps(af, bf, c);
+}
+
+__m256 SIMD::SIMD_::_mm256_fmadd(__m256i a, __m256i b, __m256i c) { 
+    __m256 af = _mm256_cvtepi32_ps(a);
+    __m256 bf = _mm256_cvtepi32_ps(b);
+    __m256 cf = _mm256_cvtepi32_ps(c);
+    return _mm256_fmadd_ps(af, bf, cf);
+}
+
+__m256 SIMD::SIMD_::_mm256_fmsub(__m256 a, __m256 b, __m256 c) { return _mm256_fmsub_ps(a, b, c); }
+
+__m256 SIMD::SIMD_::_mm256_fmsub(__m256 a, __m256 b, __m256i c) {
+    __m256 cf = _mm256_cvtepi32_ps(c);
+    return _mm256_fmsub_ps(a, b, cf);
+}
+
+__m256 SIMD::SIMD_::_mm256_fmsub(__m256 a, __m256i b, __m256 c) {
+    __m256 bf = _mm256_cvtepi32_ps(b);
+    return _mm256_fmsub_ps(a, bf, c);
+}
+
+__m256 SIMD::SIMD_::_mm256_fmsub(__m256 a, __m256i b, __m256i c) {
+    __m256 bf = _mm256_cvtepi32_ps(b);
+    __m256 cf = _mm256_cvtepi32_ps(c);
+    return _mm256_fmsub_ps(a, bf, cf);
+}
+
+__m256 SIMD::SIMD_::_mm256_fmsub(__m256i a, __m256 b, __m256 c) {
+    __m256 af = _mm256_cvtepi32_ps(a);
+    return _mm256_fmsub_ps(af, b, c);
+}
+
+__m256 SIMD::SIMD_::_mm256_fmsub(__m256i a, __m256 b, __m256i c) {
+    __m256 af = _mm256_cvtepi32_ps(a);
+    __m256 cf = _mm256_cvtepi32_ps(c);
+    return _mm256_fmsub_ps(af, b, cf);
+}
+
+__m256 SIMD::SIMD_::_mm256_fmsub(__m256i a, __m256i b, __m256 c) {
+    __m256 af = _mm256_cvtepi32_ps(a);
+    __m256 bf = _mm256_cvtepi32_ps(b);
+    return _mm256_fmsub_ps(af, bf, c);
+}
+
+__m256 SIMD::SIMD_::_mm256_fmsub(__m256i a, __m256i b, __m256i c) { 
+    __m256 af = _mm256_cvtepi32_ps(a);
+    __m256 bf = _mm256_cvtepi32_ps(b);
+    __m256 cf = _mm256_cvtepi32_ps(c);
+    return _mm256_fmsub_ps(af, bf, cf);
+}
+
 template<typename ContainerY>
 void setzero(ContainerY& Y) {
     using U = typename container_traits<ContainerY>::element_type;
@@ -77,7 +161,7 @@ void setzero(ContainerY& Y) {
     const std::size_t EDGE = N - REMAINDER;
 
     std::size_t i = 0;
-    if constexpr(std::is_same_v<T, float>) {
+    if constexpr(std::is_same_v<U, float>) {
         const __m256 zero = _mm256_setzero_ps();
 
         for(; i < EDGE; i += WIDTH)
@@ -86,7 +170,7 @@ void setzero(ContainerY& Y) {
         if(REMAINDER != 0)
             SIMD_::store_k(y + i, zero, REMAINDER);
     } 
-    else if constexpr(std::is_same_v<T, int>) {
+    else if constexpr(std::is_same_v<U, int>) {
         const __m256i zero = _mm256_setzero_si256();
 
         for(; i < EDGE; i += WIDTH)
@@ -433,7 +517,7 @@ void div(const ContainerA&, const ContainerB&, ContainerY&) {
 
 template<typename ContainerY, typename S>
 void add(ContainerY& Y, const S k) {
-    using U = typename container_type<ContainerY>::element_type;
+    using U = typename container_traits<ContainerY>::element_type;
 
     U* const y = Y.data();
     const std::size_t N = Y.size();
@@ -458,8 +542,8 @@ void add(ContainerY& Y, const S k) {
 }
 
 template<typename ContainerY, typename S>
-void sub(ContainerY&, const S) {
-    using U = typename container_type<ContainerY>::element_type;
+void sub(ContainerY& Y, const S k) {
+    using U = typename container_traits<ContainerY>::element_type;
 
     U* const y = Y.data();
     const std::size_t N = Y.size();
@@ -484,8 +568,8 @@ void sub(ContainerY&, const S) {
 }
 
 template<typename ContainerY, typename S>
-void mul(ContainerY&, const S) {
-    using U = typename container_type<ContainerY>::element_type;
+void mul(ContainerY& Y, const S k) {
+    using U = typename container_traits<ContainerY>::element_type;
 
     U* const y = Y.data();
     const std::size_t N = Y.size();
@@ -510,8 +594,8 @@ void mul(ContainerY&, const S) {
 }
 
 template<typename ContainerY, typename S>
-void div(ContainerY&, const S) {
-    using U = typename container_type<ContainerY>::element_type;
+void div(ContainerY& Y, const S k) {
+    using U = typename container_traits<ContainerY>::element_type;
 
     U* const y = Y.data();
     const std::size_t N = Y.size();
@@ -535,6 +619,86 @@ void div(ContainerY&, const S) {
     }
 }
 
+template<typename ContainerA, typename ContainerB, typename ContainerC, typename ContainerY>
+void fmadd(const ContainerA& A, const ContainerB& B, const ContainerC& C, ContainerY& Y) {
+    using A_traits = container_traits<ContainerA>;
+    using B_traits = container_traits<ContainerB>;
+    using C_traits = container_traits<ContainerC>;
+    using Y_traits = container_traits<ContainerY>;
+
+    using S = A_traits::element_type;
+    using T = B_traits::element_type;
+    using U = C_traits::element_type;
+    using V = Y_traits::element_type;
+
+    const S* const a = A.data();
+    const T* const b = B.data();
+    const U* const c = C.data();
+    V* const y = Y.data();
+
+    const std::size_t N = Y.size();
+    const std::size_t REMAINDER = N % WIDTH;
+    const std::size_t EDGE = N - REMAINDER;
+
+    std::size_t i = 0;
+    if constexpr(A_traits::container_type == B_traits::container_type && B_traits::container_type == C_traits::container_type) {
+        for(; i < EDGE; i += 8) {
+            const auto a_vec = SIMD_::_mm256_loadu(a + i);
+            const auto b_vec = SIMD_::_mm256_loadu(b + i);
+            const auto c_vec = SIMD_::_mm256_loadu(c + i);
+            auto y_vec = SIMD_::_mm256_fmadd(a_vec, b_vec, c_vec);
+
+            SIMD_::_mm256_storeu(y + i, y_vec);
+        }
+
+        if(REMAINDER != 0) {
+            const auto a_vec = SIMD_::_mm256_maskloadu(a + i, REMAINDER);
+            const auto b_vec = SIMD_::_mm256_maskloadu(b + i, REMAINDER);
+            const auto c_vec = SIMD_::_mm256_maskloadu(c + i, REMAINDER);
+            auto y_vec = SIMD_::_mm256_fmadd(a_vec, b_vec, c_vec);
+
+            SIMD_::_mm256_maskstoreu(y + i, y_vec, REMAINDER);
+        }
+    }
+}
+
+template<typename ContainerA, typename ContainerB, typename ContainerC, typename ContainerY>
+void fmsub(const ContainerA& A, const ContainerB& B, const ContainerC& C, ContainerY& Y) {
+    using S = A_traits::element_type;
+    using T = B_traits::element_type;
+    using U = C_traits::element_type;
+    using V = Y_traits::element_type;
+
+    const S* const a = A.data();
+    const T* const b = B.data();
+    const U* const c = C.data();
+    V* const y = Y.data();
+
+    const std::size_t N = Y.size();
+    const std::size_t REMAINDER = N % WIDTH;
+    const std::size_t EDGE = N - REMAINDER;
+
+    std::size_t i = 0;
+    if constexpr(A_traits::container_type == B_traits::container_type && B_traits::container_type == C_traits::container_type) {
+        for(; i < EDGE; i += 8) {
+            const auto a_vec = SIMD_::_mm256_loadu(a + i);
+            const auto b_vec = SIMD_::_mm256_loadu(b + i);
+            const auto c_vec = SIMD_::_mm256_loadu(c + i);
+            auto y_vec = SIMD_::_mm256_fmsub(a_vec, b_vec, c_vec);
+
+            SIMD_::_mm256_storeu(y + i, y_vec);
+        }
+
+        if(REMAINDER != 0) {
+            const auto a_vec = SIMD_::_mm256_maskloadu(a + i, REMAINDER);
+            const auto b_vec = SIMD_::_mm256_maskloadu(b + i, REMAINDER);
+            const auto c_vec = SIMD_::_mm256_maskloadu(c + i, REMAINDER);
+            auto y_vec = SIMD_::_mm256_fmsub(a_vec, b_vec, c_vec);
+
+            SIMD_::_mm256_maskstoreu(y + i, y_vec, REMAINDER);
+        }
+    }
+}
 
 
 

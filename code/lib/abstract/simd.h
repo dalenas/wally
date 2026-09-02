@@ -53,6 +53,24 @@ namespace Wally::Abstract::SIMD {
         __m256 _mm256_div(__m256, __m256i);
         __m256 _mm256_div(__m256i, __m256);
         __m256 _mm256_div(__m256i, __m256i);
+
+        __m256 _mm256_fmadd(__m256, __m256, __m256);
+        __m256 _mm256_fmadd(__m256, __m256, __m256i);
+        __m256 _mm256_fmadd(__m256, __m256i, __m256);
+        __m256 _mm256_fmadd(__m256, __m256i, __m256i);
+        __m256 _mm256_fmadd(__m256i, __m256, __m256);
+        __m256 _mm256_fmadd(__m256i, __m256, __m256i);
+        __m256 _mm256_fmadd(__m256i, __m256i, __m256);
+        __m256 _mm256_fmadd(__m256i, __m256i, __m256i);
+
+        __m256 _mm256_fmsub(__m256, __m256, __m256);
+        __m256 _mm256_fmsub(__m256, __m256, __m256i);
+        __m256 _mm256_fmsub(__m256, __m256i, __m256);
+        __m256 _mm256_fmsub(__m256, __m256i, __m256i);
+        __m256 _mm256_fmsub(__m256i, __m256, __m256);
+        __m256 _mm256_fmsub(__m256i, __m256, __m256i);
+        __m256 _mm256_fmsub(__m256i, __m256i, __m256);
+        __m256 _mm256_fmsub(__m256i, __m256i, __m256i);
     }
     constexpr std::size_t WIDTH = 8;
 
@@ -102,8 +120,14 @@ namespace Wally::Abstract::SIMD {
     template<typename ContainerY, typename S>
     void div(ContainerY&, const S);
 
+    // Fused operations
+    template<typename ContainerA, typename ContainerB, typename ContainerC, typename ContainerY>
+    void fmadd(const ContainerA&, const ContainerB&, const ContainerC&, ContainerY&);
+    template<typename ContainerA, typename ContainerB, typename ContainerC, typename ContainerY>
+    void fmsub(const ContainerA&, const ContainerB&, const ContainerC&, ContainerY&);
 
-     
+    // cross product, sum, dot, l1 norm, l2 norm, lp norm, squared sum
+    
 
 
 
@@ -124,14 +148,7 @@ namespace Wally::Abstract::SIMD {
     float sum(const Matrix&);
     float dot(const Matrix&, const Matrix&);
 
-    void add(const Matrix&, const Matrix&, Matrix&);
-    void sub(const Matrix&, const Matrix&, Matrix&);                    // used for error calculation
-    void mul(float, const Matrix&, Matrix&);
-    void mul(const Matrix&, const Matrix&, Matrix&);
-    void comp_div(Matrix&, float);                                      // used for averaging
-
     float square_sum(const Matrix&);                                    // used for mse calculation
-    void mult_sum();
 
     void sigmoid(Matrix&);                                              // used for binary logistic regression
     void softmax(Matrix&);                                              // used for multi logistic regression
