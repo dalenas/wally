@@ -4,6 +4,11 @@
 #include <vector>
 
 namespace Wally {
+    enum class Major {
+        row = 0,
+        col = 1
+    };
+
     template <typename T>
     class Vector {
         std::vector<T> data_;
@@ -29,10 +34,11 @@ namespace Wally {
         std::vector<U> data_;
         std::size_t rows_;
         std::size_t cols_;
+        Major axis_;
 
     public:
-        Matrix(std::size_t, std::size_t);
-        Matrix(std::size_t, std::size_t, U);
+        Matrix(std::size_t, std::size_t, Major);
+        Matrix(std::size_t, std::size_t, Major, U);
 
         U& operator()(std::size_t, std::size_t);
         const U& operator()(std::size_t, std::size_t) const;
@@ -40,6 +46,7 @@ namespace Wally {
         const std::size_t rows() const;
         const std::size_t cols() const;
         const std::size_t size() const;
+        const std::size_t axis() const;
         
         U* data();
         const U* data() const;
