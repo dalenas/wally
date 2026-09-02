@@ -54,6 +54,9 @@ namespace Wally::Abstract::SIMD {
         __m256 _mm256_div(__m256i, __m256);
         __m256 _mm256_div(__m256i, __m256i);
 
+        float _mm256_sum(__m256);
+        int _mm256_sum(__m256i);
+
         __m256 _mm256_fmadd(__m256, __m256, __m256);
         __m256 _mm256_fmadd(__m256, __m256, __m256i);
         __m256 _mm256_fmadd(__m256, __m256i, __m256);
@@ -71,6 +74,11 @@ namespace Wally::Abstract::SIMD {
         __m256 _mm256_fmsub(__m256i, __m256, __m256i);
         __m256 _mm256_fmsub(__m256i, __m256i, __m256);
         __m256 _mm256_fmsub(__m256i, __m256i, __m256i);
+
+        __m256 _mm256_pow(__m256, __m256);
+        __m256 _mm256_pow(__m256, __m256i);
+        __m256 _mm256_pow(__m256i, __m256);
+        __m256 _mm256_pow(__m256i, __m256i);
     }
     constexpr std::size_t WIDTH = 8;
 
@@ -125,13 +133,33 @@ namespace Wally::Abstract::SIMD {
     void fmadd(const ContainerA&, const ContainerB&, const ContainerC&, ContainerY&);
     template<typename ContainerA, typename ContainerB, typename ContainerC, typename ContainerY>
     void fmsub(const ContainerA&, const ContainerB&, const ContainerC&, ContainerY&);
+    template<typename ContainerY, typename S, typename ContainerA>
+    void fmadd(ContainerY&, const S, const ContainerA&);
+    template<typename ContainerY, typename S, typename ContainerA>
+    void fmsub(ContainerY&, const S, const ContainerA&);
 
-    // cross product, sum, dot, l1 norm, l2 norm, lp norm, squared sum
+    // Cross product
+    template<typename ContainerA, typename ContainerB, typename ContainerY>
+    void cross(const ContainerA&, const ContainerB&, ContainerY&);
+
+    // Square sum
+    template<typename T>
+    T sqsum(const Vector<T>&);
+    template<typename T>
+    void sqsum(const Matrix<T>&, Vector<T>&);
+
+    // Lp norm
+    template<typename S, typename T>
+    float lpnorm(const S, const Vector<T>&);
+    template<typename S, typename T>
+    void lpnorm(const S, const Matrix<T>&, Vector<float>&);
+
     
 
 
 
 
+    // cross product, sum, dot, l1 norm, l2 norm, lp norm, squared sum
 
 
 

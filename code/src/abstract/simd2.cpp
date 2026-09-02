@@ -150,6 +150,24 @@ __m256 SIMD::SIMD_::_mm256_fmsub(__m256i a, __m256i b, __m256i c) {
     return _mm256_fmsub_ps(af, bf, cf);
 }
 
+__m256 _mm256_pow(__m256 a, __m256 b) { return _mm256_pow_ps(a, b); }
+
+__m256 _mm256_pow(__m256 a, __m256i b) {
+    __m256 bf = _mm256_cvtepi32_ps(b);
+    return _mm256_pow_ps(a, bf);
+}
+
+__m256 _mm256_pow(__m256i a, __m256 b) {
+    __m256 af = _mm256_cvtepi32_ps(a);
+    return _mm256_pow_ps(af, b);
+}
+
+__m256 _mm256_pow(__m256i a, __m256i b) {
+    __m256 af = _mm256_cvtepi32_ps(a);
+    __m256 bf = _mm256_cvtepi32_ps(b);
+    return _mm256_pow_ps(af, bf);
+}
+
 template<typename ContainerY>
 void setzero(ContainerY& Y) {
     using U = typename container_traits<ContainerY>::element_type;
@@ -700,7 +718,111 @@ void fmsub(const ContainerA& A, const ContainerB& B, const ContainerC& C, Contai
     }
 }
 
+template<typename ContainerA, typename ContainerB, typename ContainerY>
+void cross(const ContainerA& A, const ContainerB& B, ContainerY& Y) {
+    // this will be assuming A is row-major and B is col-major, A is row vector and B is col-major, or A is row major and B is col vector
+    // could implement reverse, but would prob be slower because of load and store latency
+    
+}
 
+template<typename T>
+float sqsum(const Vector<T>& A) {
+    const T* const a = A.data();
+
+    const std::size_t N = A.size();
+    const std::size_t REMAINDER = N % WIDTH;
+    const std::size_t EDGE = N - REMAINDER;
+
+    std::size_t i = 0;
+    __m256 sum_vec = _mm256_setzero_ps();
+    const __m256 two_vec = SIMD_::_mm256_set1(2.0f);
+    for(; i < EDGE; i += WIDTH) {
+        const auto a_vec = SIMD_::_mm256_loadu(a + i);
+        const __m256 pow_vec = SIMD_::_mm256_pow(a_vec, two_vec);
+
+        sum_vec = SIMD_::_mm256_add(sum_vec, pow_vec);
+    }
+
+    if(REMAINDER != 0) {
+        const auto a_vec = SIMD_::_mm256_maskloadu(a + i, REMAINDER);
+        const __m256 pow_vec = SIMD_::_mm256_pow(a_vec, two_vec);
+
+        sum_vec = SIMD_::_mm256_add(sum_vec, pow_vec);
+    }
+
+    return SIMD_::_mm256_sum(sum_vec);
+}
+
+template<typename T>
+void sqsum(const Matrix<T>& A, Vector<T>& Y) {
+    const T* const a = A.data();
+    T* const y = Y.data();
+
+    const std::size_t N = A.rows();
+    const std::size_t M = A.cols();
+    
+    if(A.axis() == row) {
+        const std::size_t REMAINDER = M % WIDTH;
+        const std::size_t EDGE = M - REMAINDER;
+
+        for(std::size_t i = 0; i < N; ++i) {
+            const T* const a_row = a + i*M;
+
+            std::size_t j = 0;
+            for(; j < EDGE; j += WIDTH) {
+                const auto a_vec = SIMD_::_mm256_loadu(a_row + j);
+                __m256 sum_vec = SIMD_::_mm256_loadu(y + j);
+
+                const __m256 pow_vec = SIMD_::_mm256_mul(a_vec, a_vec);
+                sum_vec = SIMD_::_mm256_add(sum_vec, pow_vec);
+
+                SIMD_::_mm256_storeu(y + j, sum_vec);
+            }
+
+            if(REMAINDER != 0) {
+                const auto a_vec = SIMD_::_mm256_maskloadu(a_row + j, REMAINDER);
+                __m256 sum_vec = SIMD_::_mm256_maskloadu(y + j, REMAINDER);
+
+                const __m256 pow_vec = SIMD_::_mm256_mul(a_vec, a_vec);
+                sum_vec = SIMD_::_mm256_add(sum_vec, pow_vec);
+
+                SIMD_::_mm256_maskstoreu(y + j, sum_vec, REMAINDER);
+            }
+        }
+    }
+    else if(A.axis() == col) {
+        const std::size_t REMAINDER = N % WIDTH;
+        const std::size_t EDGE = N - REMAINDER;
+
+        for(std::size_t j = 0; j < M; ++j) {
+            const T* const a_col = a + j*N;
+
+            std::size_t i = 0;
+            __m256 sum_vec = __m256_setzero_ps();
+            for(; i < EDGE; i += WIDTH) {
+                const auto a_vec = SIMD_::_mm256_loadu(a_col + i);
+                const __m256 pow_vec = SIMD_::_mm256_mul(a_vec, a_vec);
+
+                sum_vec = SIMD_::_mm256_add(sum_vec, pow_vec);
+            }
+
+            if(REMAINDER != 0) {
+                const auto a_vec = SIMD_::_mm256_maskloadu(a_col + i, REMAINDER);
+                const __m256 pow_vec = SIMD_::_mm256_mul(a_vec, a_vec);
+
+                sum_vec = SIMD_::_mm256_add(sum_vec, pow_vec);
+            }
+
+            y[j] = SIMD_::_mm256_sum(sum_vec);
+        }
+    }
+}
+
+template<typename S, typename T>
+float lpnorm(const S, const Vector<T>&);
+
+template<typename S, typename T>
+void lpnorm(const S, const Matrix<T>&, Vector<float>&);
 
 
 
