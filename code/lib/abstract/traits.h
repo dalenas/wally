@@ -5,7 +5,7 @@
 
 namespace Wally::Abstract {
     template<typename T>
-    struct container_traits;
+    struct container_traits {};
 
     enum class container {
         vector, 
@@ -20,7 +20,7 @@ namespace Wally::Abstract {
 
     template<typename T>
     struct container_traits<Matrix<T>> {
-        static constexpr container container_type = container::vector;
+        static constexpr container container_type = container::matrix;
         using element_type = T;
     };
 }
