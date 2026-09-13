@@ -16,12 +16,12 @@ T& Vector<T>::operator()(std::size_t i) {
 }
 
 template<typename T>
-const T& Vector<T>::operator()(std::size_t) const {
+const T& Vector<T>::operator()(std::size_t i) const {
     return data_[i];
 }
 
 template<typename T>
-const std::size_t Vector<T>::size() const {
+std::size_t Vector<T>::size() const {
     return size_;
 }
 
@@ -45,35 +45,35 @@ Matrix<U>::Matrix(std::size_t r, std::size_t c, Major a, U init)
 
 template<typename U>
 U& Matrix<U>::operator()(std::size_t row, std::size_t col) {
-    if(axis_ == col)
+    if(axis_ == Major::col)
         return data_[row + col*rows_];
     return data_[col + row*cols_];
 }
 
 template<typename U>
 const U& Matrix<U>::operator()(std::size_t row, std::size_t col) const {
-    if(axis_ == col)
+    if(axis_ == Major::col)
         return data_[row + col*rows_];
     return data_[col + row*cols_];
 }
 
 template<typename U>
-const std::size_t Matrix<U>::rows() const {
+std::size_t Matrix<U>::rows() const {
     return rows_;
 }
 
 template<typename U>
-const std::size_t Matrix<U>::cols() const {
+std::size_t Matrix<U>::cols() const {
     return cols_;
 }
 
 template<typename U>
-const std::size_t Matrix<U>::size() const {
+std::size_t Matrix<U>::size() const {
     return rows_ * cols_;
 }
 
 template<typename U>
-const Major Matrix<U>::axis() const {
+Major Matrix<U>::axis() const {
     return axis_;
 }
 

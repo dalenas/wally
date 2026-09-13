@@ -21,7 +21,7 @@ namespace Wally {
         T& operator()(std::size_t);
         const T& operator()(std::size_t) const;
 
-        const std::size_t size() const;
+        std::size_t size() const;
 
         T* data();
         const T* data() const;
@@ -43,10 +43,10 @@ namespace Wally {
         U& operator()(std::size_t, std::size_t);
         const U& operator()(std::size_t, std::size_t) const;
 
-        const std::size_t rows() const;
-        const std::size_t cols() const;
-        const std::size_t size() const;
-        const Major axis() const;
+        std::size_t rows() const;
+        std::size_t cols() const;
+        std::size_t size() const;
+        Major axis() const;
         
         U* data();
         const U* data() const;

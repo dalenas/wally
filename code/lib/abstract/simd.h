@@ -19,14 +19,14 @@ namespace Wally::Abstract::SIMD {
             _mm256_setr_epi32(-1, -1, -1, -1, -1, -1, -1, -1)
         };
 
-        __m256 _mm256_loadu(const float* const);
-        __m256i _mm256_loadu(const int* const);
+        inline __m256 _mm256_loadu(const float* const);
+        inline __m256i _mm256_loadu(const int* const);
 
         __m256 _mm256_maskloadu(const float* const, std::size_t);                      // masked load for remainder calculations
         __m256i _mm256_maskloadu(const int* const, std::size_t);
 
-        void _mm256_storeu(float*, __m256);
-        void _mm256_storeu(int*, __m256i);
+        inline void _mm256_storeu(float*, __m256);
+        inline void _mm256_storeu(int*, __m256i);
 
         void _mm256_maskstoreu(float*, __m256, std::size_t);                           // masked store for remainder calcs
         void _mm256_maskstoreu(int*, __m256i, std::size_t);
@@ -78,10 +78,12 @@ namespace Wally::Abstract::SIMD {
         __m256 _mm256_fmsub(__m256i, __m256i, __m256);
         __m256 _mm256_fmsub(__m256i, __m256i, __m256i);
 
+        /*
         __m256 _mm256_pow(__m256, __m256);
         __m256 _mm256_pow(__m256, __m256i);
         __m256 _mm256_pow(__m256i, __m256);
         __m256 _mm256_pow(__m256i, __m256i);
+        */
 
         __m256 _mm256_abs(__m256);
         __m256i _mm256_abs(__m256i);
@@ -153,18 +155,20 @@ namespace Wally::Abstract::SIMD {
 
     // Square sum
     template<typename T>
-    T sqsum(const Vector<T>&);
+    float sqsum(const Vector<T>&);
     template<typename T>
     void sqsum(const Matrix<T>&, Vector<T>&);
 
     // Lp norm
+    /*
     template<typename T>
     float lpnorm(const float, const Vector<T>&);
     template<typename T>
     void lpnorm(const float, const Matrix<T>&, Vector<float>&);
+    */
 
     // Sigmoid and softmax
-    void softmax(const Matrix<float>&, const Vector<int>&, Matrix<float>&);
+    // void softmax(const Matrix<float>&, const Vector<int>&, Matrix<float>&);
 }
 
 #endif
