@@ -12,40 +12,40 @@ MODELS: $(REGRESSORS) $(CLASSIFIERS) obj/models/model_library.o
 all: $(PREPROCESS) $(MODELS) obj/wally.o
 
 obj/interface/containers.o: src/interface/containers.cpp lib/interface/containers.h
-	$(CXX) $(CXXFLAGS) -c src/interface/containers.cpp -o obj/interface/containers.o
+	$(CXX) $(CXXFLAGS) -c $@ -o $<
 
 obj/abstract/traits.o: src/abstract/traits.cpp lib/abstract/traits.h
-	$(CXX) $(CXXFLAGS) -c src/abstract/traits.cpp -o obj/abstract/traits.o
+	$(CXX) $(CXXFLAGS) -c $@ -o $<
 
 obj/abstract/simd.o: src/abstract/simd.cpp lib/abstract/simd.h
-	$(CXX) $(CXXFLAGS) -c src/abstract/simd.cpp -o obj/abstract/simd.o
+	$(CXX) $(CXXFLAGS) -c $@ -o $<
 
 obj/preprocessing/dataset.o: src/preprocessing/dataset.cpp lib/preprocessing/dataset.h
-	$(CXX) $(CXXFLAGS) -c src/preprocessing/dataset.cpp -o obj/preprocessing/dataset.o
+	$(CXX) $(CXXFLAGS) -c $@ -o $<
 
 obj/preprocessing/stats.o: src/preprocessing/stats.cpp lib/preprocessing/stats.h
-	$(CXX) $(CXXFLAGS) -c src/preprocessing/stats.cpp -o obj/preprocessing/stats.o
+	$(CXX) $(CXXFLAGS) -c $@ -o $<
 
 obj/models/ml.o: src/models/ml.cpp lib/models/ml.h
-	$(CXX) $(CXXFLAGS) -c src/models/ml.cpp -o obj/models/ml.o
+	$(CXX) $(CXXFLAGS) -c $@ -o $<
 
 obj/models/linear_regression.o: src/models/linear_regression.cpp lib/models/linear_regression.h
-	$(CXX) $(CXXFLAGS) -c src/models/linear_regression.cpp -o obj/models/linear_regression.o
+	$(CXX) $(CXXFLAGS) -c $@ -o $<
 
 obj/models/polynomial_regression.o: src/models/polynomial_regression.cpp lib/models/polynomial_regression.h
-	$(CXX) $(CXXFLAGS) -c src/models/polynomial_regression.cpp -o obj/models/polynomial_regression.o
+	$(CXX) $(CXXFLAGS) -c $@ -o $<
 
 obj/models/binary_logistic_regression.o: src/models/binary_logistic_regression.cpp lib/models/binary_logistic_regression.h
-	$(CXX) $(CXXFLAGS) -c src/models/binary_logistic_regression.cpp -o obj/models/binary_logistic_regression.o
+	$(CXX) $(CXXFLAGS) -c $@ -o $<
 
 obj/models/multi_logistic_regression.o: src/models/multi_logistic_regression.cpp lib/models/multi_logistic_regression.h
-	$(CXX) $(CXXFLAGS) -c src/models/multi_logistic_regression.cpp -o obj/models/multi_logistic_regression.o
+	$(CXX) $(CXXFLAGS) -c $@ -o $<
 
 obj/models/model_library.o: src/models/model_library.cpp lib/models/model_library.h
-	$(CXX) $(CXXFLAGS) -c src/models/model_library.cpp -o obj/models/model_library.o
+	$(CXX) $(CXXFLAGS) -c $@ -o $<
 
 obj/wally.o: src/wally.cpp lib/wally.h
-	$(CXX) $(CXXFLAGS) -c src/wally.cpp -o obj/wally.o
+	$(CXX) $(CXXFLAGS) -c $@ -o $<
 
 clean:
 	rm -f obj/interface/*.o
