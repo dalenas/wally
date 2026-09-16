@@ -18,13 +18,16 @@ namespace Wally {
         Vector(std::size_t);
         Vector(std::size_t, T);
 
-        T& operator()(std::size_t);
-        const T& operator()(std::size_t) const;
+        Vector(const Vector<T>&);
+        Vector<T>& operator=(const Vector<T>&);
 
         std::size_t size() const;
 
         T* data();
         const T* data() const;
+
+        T& operator()(std::size_t);
+        const T& operator()(std::size_t) const;
 
         ~Vector() = default;
     };
@@ -37,8 +40,12 @@ namespace Wally {
         Major axis_;
 
     public:
+        Matrix(std::size_t, std::size_t);
         Matrix(std::size_t, std::size_t, Major);
         Matrix(std::size_t, std::size_t, Major, U);
+
+        Matrix(const Matrix<U>&);
+        Matrix<U>& operator=(const Matrix<U>&);
 
         U& operator()(std::size_t, std::size_t);
         const U& operator()(std::size_t, std::size_t) const;
@@ -54,5 +61,7 @@ namespace Wally {
         ~Matrix() = default;
     };
 }
+
+#include "interface/containers.tpp"
 
 #endif

@@ -1,7 +1,7 @@
 #ifndef TRAITS_H
 #define TRAITS_H
 
-#include "../interface/containers.h"
+#include "interface/containers.h"
 
 namespace Wally::Abstract {
     template<typename T>
@@ -26,7 +26,7 @@ namespace Wally::Abstract {
 
     template<typename T>
     concept Container = requires(T x) {
-        typename container_traits<T>::container_type;
+        typename container_traits<T>::element_type;
         x.data();
         x.size();
     };
