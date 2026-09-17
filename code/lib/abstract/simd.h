@@ -35,7 +35,7 @@ namespace Wally::Abstract::SIMD {
         auto _mm256_setzero();
 
         __m256 _mm256_set1(float);
-        __m256 _mm256_set1(int);
+        __m256i _mm256_set1(int);
 
         __m256 _mm256_add(__m256, __m256);
         __m256 _mm256_add(__m256, __m256i);
@@ -170,5 +170,7 @@ namespace Wally::Abstract::SIMD {
     // Sigmoid and softmax
     // void softmax(const Matrix<float>&, const Vector<int>&, Matrix<float>&);
 }
+
+#include "abstract/simd.tpp"
 
 #endif

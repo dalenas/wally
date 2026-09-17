@@ -2,19 +2,19 @@ using namespace Wally;
 using namespace Abstract;
 
 __m256 SIMD::SIMD_::_mm256_loadu(const float* const addr) { return _mm256_loadu_ps(addr); }
-__m256i SIMD::SIMD_::_mm256_loadu(const int* const addr) { return _mm256_loadu_epi32(addr); }
+__m256i SIMD::SIMD_::_mm256_loadu(const int* const addr) { return _mm256_loadu_si256(reinterpret_cast<const __m256i*>(addr)); }
 
 __m256 SIMD::SIMD_::_mm256_maskloadu(const float* const addr, std::size_t k) { return _mm256_maskload_ps(addr, masks[k]); }
 __m256i SIMD::SIMD_::_mm256_maskloadu(const int* const addr, std::size_t k) { return _mm256_maskload_epi32(addr, masks[k]); }
 
 void SIMD::SIMD_::_mm256_storeu(float* addr, __m256 a) { _mm256_storeu_ps(addr, a); }
-void SIMD::SIMD_::_mm256_storeu(int* addr, __m256i a) { _mm256_storeu_epi32(addr, a); }
+void SIMD::SIMD_::_mm256_storeu(int* addr, __m256i a) { _mm256_storeu_si256(reinterpret_cast<__m256i*>(addr), a); }
 
 void SIMD::SIMD_::_mm256_maskstoreu(float* addr, __m256 a, std::size_t k) { _mm256_maskstore_ps(addr, masks[k], a); }
 void SIMD::SIMD_::_mm256_maskstoreu(int* addr, __m256i a, std::size_t k) { _mm256_maskstore_epi32(addr, masks[k], a); }
 
 __m256 SIMD::SIMD_::_mm256_set1(float k) { return _mm256_set1_ps(k); }
-__m256 SIMD::SIMD_::_mm256_set1(int k) { return _mm256_set1_ps(static_cast<float>(k)); }            // may want to change to m256i, which would require if constexpr conditions in scalar operations
+__m256i SIMD::SIMD_::_mm256_set1(int k) { return _mm256_set1_epi32(k); }            // may want to change to m256i, which would require if constexpr conditions in scalar operations
 
 template<typename T>
 auto SIMD::SIMD_::_mm256_setzero() {
