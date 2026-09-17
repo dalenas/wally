@@ -293,7 +293,7 @@ void SIMD::sum(const Matrix<T>& A, Vector<T>& Y) {
             }
 
             if(REMAINDER != 0) {
-                const auto a_vec = SIMD_::_mm256_maskloadu(a_col + i);
+                const auto a_vec = SIMD_::_mm256_maskloadu(a_col + i, REMAINDER);
 
                 sum_vec = SIMD_::_mm256_add(a_vec, sum_vec);
             }
@@ -313,8 +313,8 @@ T SIMD::dot(const Vector<T>& A, const Vector<T>& B) {
     const std::size_t EDGE = N - WIDTH;
 
     std::size_t i = 0;
-    auto dot_vec = SIMD_::_mm256_setzero<T>();
-    for(; i < EDGE; i += 8) {
+    auto dot_vec = SIMD_::_mm256_setzero<float>();
+    for(; i < EDGE; i += WIDTH) {
         const auto a_vec = SIMD_::_mm256_loadu(a + i);
         const auto b_vec = SIMD_::_mm256_loadu(b + i);
 
