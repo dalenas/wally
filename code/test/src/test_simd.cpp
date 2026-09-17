@@ -496,7 +496,7 @@ TEST(SIMDTestsPrivate, Rcp) {
     const std::size_t N = 10;
     const std::size_t REMAINDER = N % SIMD::WIDTH;
     
-    const float MAX_ERR = 1.5f * 0.000244140625f;    // 1.5*2^-12
+    const float MAX_ERR = 1.5f * 0.000244140625f;    // 1.5*2^-12 (source: AVX documentations)
 
     float a[N] = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f};
     int b[N] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
@@ -530,10 +530,87 @@ TEST(SIMDTestsPrivate, Rcp) {
     }
 }
 
+TEST(SIMDTests, Zero) {
+    const std::size_t N = 10;
+    const float INITf = 7.0f;
+    
+    Vector<float> v(N, INITf);
+    Matrix<float> X(N, N, Major::row, INITf);
+
+    SIMD::setzero(v);
+    SIMD::setzero(X);
+
+    for(std::size_t i = 0; i < N; ++i) {
+        ASSERT_FLOAT_EQ(v(i), 0.0f);
+        for(std::size_t j = 0; j < N; ++j)
+            ASSERT_FLOAT_EQ(X(i, j), 0.0f);
+    }
+
+    const int INITi = 7.0f;
+    
+    Vector<int> w(N, INITi);
+    Matrix<int> Y(N, N, Major::row, INITi);
+
+    SIMD::setzero(w);
+    SIMD::setzero(Y);
+
+    for(std::size_t i = 0; i < N; ++i) {
+        ASSERT_FLOAT_EQ(w(i), 0);
+        for(std::size_t j = 0; j < N; ++j)
+            ASSERT_FLOAT_EQ(Y(i, j), 0);
+    }
+}
+
+TEST(SIMDTests, Sum) {
+    const std::size_t N = 10;
+
+    const float INITf = 7.0f;
+
+    Vector<float> v(N, INITf);
+    Matrix<float> X(N, N, Major::row, INITf);
+
+    float v_sum = SIMD::sum(v);
+    Vector<float> X_sum(N, 0.0f);
+    SIMD::sum(X, X_sum);
+
+    ASSERT_FLOAT_EQ(v_sum, 70.0f);
+    for(std::size_t i = 0; i < N; ++i)
+        ASSERT_FLOAT_EQ(X_sum(i), 70.0f);
+
+    const int INITi = 7;
+
+    Vector<int> w(N, INITi);
+    Matrix<int> Y(N, N, Major::row, INITi);
+
+    int w_sum = SIMD::sum(v);
+    Vector<int> Y_sum(N);
+    SIMD::sum(Y, Y_sum);
+
+    ASSERT_FLOAT_EQ(w_sum, 70);
+    for(std::size_t i = 0; i < N; ++i)
+        ASSERT_EQ(Y_sum(i), 70);
+}
+
+TEST(SIMDTests, Dot) {
+    const std::size_t N = 10;
+
+    Vector<float> v(N);
+
+    for(std::size_t i = 0; i < N; ++i)
+        v(i) = static_cast<float>(i+1);
+    
+    float v_dot = SIMD::dot(v, v);
+    ASSERT_FLOAT_EQ(v_dot, 385.0f);
+
+    Vector<int> w(N);
+
+    for(std::size_t i = 0; i < N; ++i)
+        w(i) = static_cast<int>(i+1);
+    
+    int w_dot = SIMD::dot(w, w);
+    ASSERT_EQ(w_dot, 385);
+}
 /*
-TEST(SIMDTests, Zero);
-TEST(SIMDTests, Sum);
-TEST(SIMDTests, Dot);
 TEST(SIMDTests, Add);
 TEST(SIMDTests, Sub);
 TEST(SIMDTests, Mul);
