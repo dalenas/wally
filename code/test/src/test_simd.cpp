@@ -583,7 +583,7 @@ TEST(SIMDTests, Sum) {
     Matrix<int> Y(N, N, Major::row, INITi);
 
     int w_sum = SIMD::sum(v);
-    Vector<int> Y_sum(N);
+    Vector<int> Y_sum(N, 0);
     SIMD::sum(Y, Y_sum);
 
     ASSERT_FLOAT_EQ(w_sum, 70);
@@ -610,11 +610,79 @@ TEST(SIMDTests, Dot) {
     int w_dot = SIMD::dot(w, w);
     ASSERT_EQ(w_dot, 385);
 }
+
+TEST(SIMDTests, Add) {
+    const std::size_t N = 10;
+
+    Vector<float> v(N);
+    for(std::size_t i = 0; i < N; ++i)
+        v(i) = static_cast<float>(i+1);
+
+    const float K = 7.0f;
+    Vector<float> y(N, 0.0f);
+    SIMD::add(K, v, y);
+
+    for(std::size_t i = 0; i < N; ++i)
+        ASSERT_FLOAT_EQ(y(i), K + static_cast<float>(i+1));
+}
+
+TEST(SIMDTests, Sub) {
+    const std::size_t N = 10;
+
+    Vector<float> v(N);
+    for(std::size_t i = 0; i < N; ++i)
+        v(i) = static_cast<float>(i+1);
+
+    const float K = 7.0f;
+    Vector<float> y(N, 0.0f);
+    SIMD::sub(K, v, y);
+
+    for(std::size_t i = 0; i < N; ++i)
+        ASSERT_FLOAT_EQ(y(i), K - static_cast<float>(i+1));
+
+    Vector<float> z(N, 0.0f);
+    SIMD::sub(v, K, z);
+
+    for(std::size_t i = 0; i < N; ++i)
+        ASSERT_FLOAT_EQ(z(i), static_cast<float>(i+1) - K);
+}
+
+TEST(SIMDTests, Mul) {
+    const std::size_t N = 10;
+
+    Vector<float> v(N);
+    for(std::size_t i = 0; i < N; ++i)
+        v(i) = static_cast<float>(i+1);
+
+    const float K = 7.0f;
+    Vector<float> y(N, 0.0f);
+    SIMD::mul(K, v, y);
+
+    for(std::size_t i = 0; i < N; ++i)
+        ASSERT_FLOAT_EQ(y(i), K * static_cast<float>(i+1));
+}
+
+TEST(SIMDTests, Div) {
+    const std::size_t N = 10;
+
+    Vector<float> v(N);
+    for(std::size_t i = 0; i < N; ++i)
+        v(i) = static_cast<float>(i+1);
+
+    const float K = 7.0f;
+    Vector<float> y(N, 0.0f);
+    SIMD::div(K, v, y);
+
+    for(std::size_t i = 0; i < N; ++i)
+        ASSERT_FLOAT_EQ(y(i), K / static_cast<float>(i+1));
+
+    Vector<float> z(N, 0.0f);
+    SIMD::div(v, K, z);
+
+    for(std::size_t i = 0; i < N; ++i)
+        ASSERT_FLOAT_EQ(z(i), static_cast<float>(i+1) / K);
+}
 /*
-TEST(SIMDTests, Add);
-TEST(SIMDTests, Sub);
-TEST(SIMDTests, Mul);
-TEST(SIMDTests, Div);
 TEST(SIMDTests, Fmadd);
 TEST(SIMDTests, Fmsub);
 TEST(SIMDTests, Cross);
