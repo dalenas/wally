@@ -614,73 +614,203 @@ TEST(SIMDTests, Dot) {
 TEST(SIMDTests, Add) {
     const std::size_t N = 10;
 
-    Vector<float> v(N);
-    for(std::size_t i = 0; i < N; ++i)
-        v(i) = static_cast<float>(i+1);
-
     const float K = 7.0f;
-    Vector<float> y(N, 0.0f);
-    SIMD::add(K, v, y);
+    const int C = 7;
 
-    for(std::size_t i = 0; i < N; ++i)
+    Vector<float> v(N);
+    Vector<int> w(N);
+    Matrix<float> A(N, N);
+    Matrix<int> B(N, N);
+
+    Vector<float> y(N, 0.0f);
+    Vector<int> z(N, 0);
+    Matrix<float> Y(N, N, Major::row, 0.0f);
+    Matrix<int> Z(N, N, Major::row, 0);
+
+
+    for(std::size_t i = 0; i < N; ++i) {
+        v(i) = static_cast<float>(i+1);
+        w(i) = static_cast<int>(i+1);
+        for(std::size_t j = 0; j < N; ++j) {
+            A(i, j) = static_cast<float>(i*N + j + 1);
+            B(i, j) = static_cast<int>(i*N + j + 1);
+        }
+    }
+
+    SIMD::add(K, v, y);
+    SIMD::add(C, w, z);
+    SIMD::add(K, A, Y);
+    SIMD::add(C, B, Z);
+
+    for(std::size_t i = 0; i < N; ++i) {
         ASSERT_FLOAT_EQ(y(i), K + static_cast<float>(i+1));
+        ASSERT_EQ(z(i), C + static_cast<int>(i+1));
+        for(std::size_t j = 0; j < N; ++j) {
+            ASSERT_FLOAT_EQ(Y(i, j), K + static_cast<float>(i*N + j + 1));
+            ASSERT_EQ(Z(i, j), C + static_cast<int>(i*N + j + 1));
+        }
+    }
+
+    SIMD::add(v, v, y);
+    SIMD::add(w, w, z);
+    SIMD::add(A, A, Y);
+    SIMD::add(B, B, Z);
+
+    for(std::size_t i = 0; i < N; ++i) {
+        ASSERT_FLOAT_EQ(y(i), 2*static_cast<float>(i+1));
+        ASSERT_EQ(z(i), 2*static_cast<int>(i+1));
+        for(std::size_t j = 0; j < N; ++j) {
+            ASSERT_FLOAT_EQ(Y(i, j), 2*static_cast<float>(i*N + j + 1));
+            ASSERT_EQ(Z(i, j), 2*static_cast<int>(i*N + j + 1));
+        }
+    }
 }
 
 TEST(SIMDTests, Sub) {
     const std::size_t N = 10;
 
-    Vector<float> v(N);
-    for(std::size_t i = 0; i < N; ++i)
-        v(i) = static_cast<float>(i+1);
-
     const float K = 7.0f;
-    Vector<float> y(N, 0.0f);
-    SIMD::sub(K, v, y);
+    const int C = 7;
 
-    for(std::size_t i = 0; i < N; ++i)
-        ASSERT_FLOAT_EQ(y(i), K - static_cast<float>(i+1));
+    Vector<float> v(N);
+    Vector<int> w(N);
+    Matrix<float> A(N, N);
+    Matrix<int> B(N, N);
 
-    Vector<float> z(N, 0.0f);
-    SIMD::sub(v, K, z);
+    Vector<float> y1(N, 0.0f);
+    Vector<int> z1(N, 0);
+    Vector<float> y2(N, 0.0f);
+    Vector<int> z2(N, 0);
+    Matrix<float> Y1(N, N, Major::row, 0.0f);
+    Matrix<int> Z1(N, N, Major::row, 0);
+    Matrix<float> Y2(N, N, Major::row, 0.0f);
+    Matrix<int> Z2(N, N, Major::row, 0);
 
-    for(std::size_t i = 0; i < N; ++i)
-        ASSERT_FLOAT_EQ(z(i), static_cast<float>(i+1) - K);
+
+    for(std::size_t i = 0; i < N; ++i) {
+        v(i) = static_cast<float>(i+1);
+        w(i) = static_cast<int>(i+1);
+        for(std::size_t j = 0; j < N; ++j) {
+            A(i, j) = static_cast<float>(i*N + j + 1);
+            B(i, j) = static_cast<int>(i*N + j + 1);
+        }
+    }
+
+    SIMD::sub(K, v, y1);
+    SIMD::sub(C, w, z1);
+    SIMD::sub(v, K, y2);
+    SIMD::sub(w, C, z2);
+    SIMD::sub(K, A, Y1);
+    SIMD::sub(C, B, Z1);
+    SIMD::sub(A, K, Y2);
+    SIMD::sub(B, C, Z2);
+
+    for(std::size_t i = 0; i < N; ++i) {
+        ASSERT_FLOAT_EQ(y1(i), K - static_cast<float>(i+1));
+        ASSERT_EQ(z1(i), C - static_cast<float>(i+1));
+        ASSERT_FLOAT_EQ(y2(i), static_cast<float>(i+1) - K);
+        ASSERT_EQ(z2(i), static_cast<float>(i+1) - C);
+        for(std::size_t j = 0; j < N; ++j) {
+            ASSERT_FLOAT_EQ(Y1(i, j), K - static_cast<float>(i*N + j + 1));
+            ASSERT_EQ(Z1(i, j), C - static_cast<float>(i*N + j + 1));
+            ASSERT_FLOAT_EQ(Y2(i, j), static_cast<float>(i*N + j + 1) - K);
+            ASSERT_EQ(Z2(i, j), static_cast<float>(i*N + j + 1) - C);
+        }
+    }
 }
 
 TEST(SIMDTests, Mul) {
     const std::size_t N = 10;
 
-    Vector<float> v(N);
-    for(std::size_t i = 0; i < N; ++i)
-        v(i) = static_cast<float>(i+1);
-
     const float K = 7.0f;
-    Vector<float> y(N, 0.0f);
-    SIMD::mul(K, v, y);
+    const int C = 7;
 
-    for(std::size_t i = 0; i < N; ++i)
+    Vector<float> v(N);
+    Vector<int> w(N);
+    Matrix<float> A(N, N);
+    Matrix<int> B(N, N);
+
+    Vector<float> y(N, 0.0f);
+    Vector<int> z(N, 0);
+    Matrix<float> Y(N, N, Major::row, 0.0f);
+    Matrix<int> Z(N, N, Major::row, 0);
+
+
+    for(std::size_t i = 0; i < N; ++i) {
+        v(i) = static_cast<float>(i+1);
+        w(i) = static_cast<int>(i+1);
+        for(std::size_t j = 0; j < N; ++j) {
+            A(i, j) = static_cast<float>(i*N + j + 1);
+            B(i, j) = static_cast<int>(i*N + j + 1);
+        }
+    }
+
+    SIMD::mul(K, v, y);
+    SIMD::mul(C, w, z);
+    SIMD::mul(K, A, Y);
+    SIMD::mul(C, B, Z);
+
+    for(std::size_t i = 0; i < N; ++i) {
         ASSERT_FLOAT_EQ(y(i), K * static_cast<float>(i+1));
+        ASSERT_EQ(z(i), C * static_cast<int>(i+1));
+        for(std::size_t j = 0; j < N; ++j) {
+            ASSERT_FLOAT_EQ(Y(i, j), K * static_cast<float>(i*N + j + 1));
+            ASSERT_EQ(Z(i, j), C * static_cast<int>(i*N + j + 1));
+        }
+    }
 }
 
 TEST(SIMDTests, Div) {
     const std::size_t N = 10;
 
-    Vector<float> v(N);
-    for(std::size_t i = 0; i < N; ++i)
-        v(i) = static_cast<float>(i+1);
-
     const float K = 7.0f;
-    Vector<float> y(N, 0.0f);
-    SIMD::div(K, v, y);
+    const int C = 7;
 
-    for(std::size_t i = 0; i < N; ++i)
-        ASSERT_FLOAT_EQ(y(i), K / static_cast<float>(i+1));
+    Vector<float> v(N);
+    Vector<int> w(N);
+    Matrix<float> A(N, N);
+    Matrix<int> B(N, N);
 
-    Vector<float> z(N, 0.0f);
-    SIMD::div(v, K, z);
+    Vector<float> y1(N, 0.0f);
+    Vector<float> z1(N, 0.0f);
+    Vector<float> y2(N, 0.0f);
+    Vector<float> z2(N, 0.0f);
+    Matrix<float> Y1(N, N, Major::row, 0.0f);
+    Matrix<float> Z1(N, N, Major::row, 0.0f);
+    Matrix<float> Y2(N, N, Major::row, 0.0f);
+    Matrix<float> Z2(N, N, Major::row, 0.0f);
 
-    for(std::size_t i = 0; i < N; ++i)
-        ASSERT_FLOAT_EQ(z(i), static_cast<float>(i+1) / K);
+
+    for(std::size_t i = 0; i < N; ++i) {
+        v(i) = static_cast<float>(i+1);
+        w(i) = static_cast<int>(i+1);
+        for(std::size_t j = 0; j < N; ++j) {
+            A(i, j) = static_cast<float>(i*N + j + 1);
+            B(i, j) = static_cast<int>(i*N + j + 1);
+        }
+    }
+
+    SIMD::div(K, v, y1);
+    SIMD::div(C, w, z1);
+    SIMD::div(v, K, y2);
+    SIMD::div(w, C, z2);
+    SIMD::div(K, A, Y1);
+    SIMD::div(C, B, Z1);
+    SIMD::div(A, K, Y2);
+    SIMD::div(B, C, Z2);
+
+    for(std::size_t i = 0; i < N; ++i) {
+        ASSERT_FLOAT_EQ(y1(i), K / static_cast<float>(i+1));
+        ASSERT_FLOAT_EQ(z1(i), static_cast<float>(C) / static_cast<float>(i+1));
+        ASSERT_FLOAT_EQ(y2(i), static_cast<float>(i+1) / K);
+        ASSERT_FLOAT_EQ(z2(i), static_cast<float>(i+1) / static_cast<float>(C));
+        for(std::size_t j = 0; j < N; ++j) {
+            ASSERT_FLOAT_EQ(Y1(i, j), K / static_cast<float>(i*N + j + 1));
+            ASSERT_FLOAT_EQ(Z1(i, j), static_cast<float>(C) / static_cast<float>(i*N + j + 1));
+            ASSERT_FLOAT_EQ(Y2(i, j), static_cast<float>(i*N + j + 1) / K);
+            ASSERT_FLOAT_EQ(Z2(i, j), static_cast<float>(i*N + j + 1) / static_cast<float>(C));
+        }
+    }
 }
 /*
 TEST(SIMDTests, Fmadd);

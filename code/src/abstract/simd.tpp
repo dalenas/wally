@@ -331,7 +331,7 @@ T SIMD::dot(const Vector<T>& A, const Vector<T>& B) {
     return SIMD_::_mm256_sum(dot_vec);
 }
 
-template<typename S, Container ContainerA, Container ContainerY>
+template<Scalar S, Container ContainerA, Container ContainerY>
 void SIMD::add(const S k, const ContainerA& A, ContainerY& Y) {
     using T = typename container_traits<ContainerA>::element_type;
     using U = typename container_traits<ContainerY>::element_type;
@@ -360,7 +360,7 @@ void SIMD::add(const S k, const ContainerA& A, ContainerY& Y) {
     }
 }
 
-template<typename S, Container ContainerA, Container ContainerY>
+template<Scalar S, Container ContainerA, Container ContainerY>
 void SIMD::sub(const S k, const ContainerA& A, ContainerY& Y) {
     using T = typename container_traits<ContainerA>::element_type;
     using U = typename container_traits<ContainerY>::element_type;
@@ -389,7 +389,7 @@ void SIMD::sub(const S k, const ContainerA& A, ContainerY& Y) {
     }
 }
 
-template<Container ContainerA, typename S, Container ContainerY>
+template<Container ContainerA, Scalar S, Container ContainerY>
 void SIMD::sub(const ContainerA& A, const S k, ContainerY& Y) {
     using T = typename container_traits<ContainerA>::element_type;
     using U = typename container_traits<ContainerY>::element_type;
@@ -418,7 +418,7 @@ void SIMD::sub(const ContainerA& A, const S k, ContainerY& Y) {
     }
 }
 
-template<typename S, Container ContainerA, Container ContainerY>
+template<Scalar S, Container ContainerA, Container ContainerY>
 void SIMD::mul(const S k, const ContainerA& A, ContainerY& Y) {
     using T = typename container_traits<ContainerA>::element_type;
     using U = typename container_traits<ContainerY>::element_type;
@@ -447,7 +447,7 @@ void SIMD::mul(const S k, const ContainerA& A, ContainerY& Y) {
     }
 }
 
-template<typename S, Container ContainerA, Container ContainerY>
+template<Scalar S, Container ContainerA, Container ContainerY>
 void SIMD::div(const S k, const ContainerA& A, ContainerY& Y) {
     using T = typename container_traits<ContainerA>::element_type;
     using U = typename container_traits<ContainerY>::element_type;
@@ -477,7 +477,7 @@ void SIMD::div(const S k, const ContainerA& A, ContainerY& Y) {
     }
 }
 
-template<Container ContainerA, typename S, Container ContainerY>
+template<Container ContainerA, Scalar S, Container ContainerY>
 void SIMD::div(const ContainerA& A, const S k, ContainerY& Y) {
     using T = typename container_traits<ContainerA>::element_type;
     using U = typename container_traits<ContainerY>::element_type;
@@ -659,7 +659,7 @@ void SIMD::div(const ContainerA& A, const ContainerB& B, ContainerY& Y) {
     } // need to add matrix / vector, vector / matrix 
 }
 
-template<Container ContainerY, typename S>
+template<Container ContainerY, Scalar S>
 void SIMD::add(ContainerY& Y, const S k) {
     using U = typename container_traits<ContainerY>::element_type;
 
@@ -685,7 +685,7 @@ void SIMD::add(ContainerY& Y, const S k) {
     }
 }
 
-template<Container ContainerY, typename S>
+template<Container ContainerY, Scalar S>
 void SIMD::sub(ContainerY& Y, const S k) {
     using U = typename container_traits<ContainerY>::element_type;
 
@@ -711,7 +711,7 @@ void SIMD::sub(ContainerY& Y, const S k) {
     }
 }
 
-template<Container ContainerY, typename S>
+template<Container ContainerY, Scalar S>
 void SIMD::mul(ContainerY& Y, const S k) {
     using U = typename container_traits<ContainerY>::element_type;
 
@@ -737,7 +737,7 @@ void SIMD::mul(ContainerY& Y, const S k) {
     }
 }
 
-template<Container ContainerY, typename S>
+template<Container ContainerY, Scalar S>
 void SIMD::div(ContainerY& Y, const S k) {
     using U = typename container_traits<ContainerY>::element_type;
 

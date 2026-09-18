@@ -24,7 +24,10 @@ namespace Wally::Abstract {
         using element_type = T;
     };
 
-    template<typename T>
+    template<typename S>
+    concept Scalar = std::is_same_v<S, int> || std::is_same_v<S, float>;
+
+    template<class T>
     concept Container = requires(T x) {
         typename container_traits<T>::element_type;
         x.data();

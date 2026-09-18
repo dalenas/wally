@@ -106,17 +106,17 @@ namespace Wally::Abstract::SIMD {
     T dot(const Vector<T>&, const Vector<T>&);
     
     // Scalar broadcast operations
-    template<typename S, Container ContainerA, Container ContainerY>
+    template<Scalar S, Container ContainerA, Container ContainerY>
     void add(const S, const ContainerA&, ContainerY&);
-    template<typename S, Container ContainerA, Container ContainerY>
+    template<Scalar S, Container ContainerA, Container ContainerY>
     void sub(const S, const ContainerA&, ContainerY&);
-    template<Container ContainerA, typename S, Container ContainerY>
+    template<Container ContainerA, Scalar S, Container ContainerY>
     void sub(const ContainerA&, const S, ContainerY&);
-    template<typename S, Container ContainerA, Container ContainerY>
+    template<Scalar S, Container ContainerA, Container ContainerY>
     void mul(const S, const ContainerA&, ContainerY&);
-    template<typename S, Container ContainerA, Container ContainerY>
+    template<Scalar S, Container ContainerA, Container ContainerY>
     void div(const S, const ContainerA&, ContainerY&);
-    template<Container ContainerA, typename S, Container ContainerY>
+    template<Container ContainerA, Scalar S, Container ContainerY>
     void div(const ContainerA&, const S, ContainerY&);
 
     // Element-wise operations
@@ -130,13 +130,13 @@ namespace Wally::Abstract::SIMD {
     void div(const ContainerA&, const ContainerB&, ContainerY&);
 
     // Compound scalar operations
-    template<Container ContainerY, typename S>
+    template<Container ContainerY, Scalar S>
     void add(ContainerY&, const S);
-    template<Container ContainerY, typename S>
+    template<Container ContainerY, Scalar S>
     void sub(ContainerY&, const S);
-    template<Container ContainerY, typename S>
+    template<Container ContainerY, Scalar S>
     void mul(ContainerY&, const S);
-    template<Container ContainerY, typename S>
+    template<Container ContainerY, Scalar S>
     void div(ContainerY&, const S);
 
     // Fused operations
@@ -144,9 +144,9 @@ namespace Wally::Abstract::SIMD {
     void fmadd(const ContainerA&, const ContainerB&, const ContainerC&, ContainerY&);
     template<Container ContainerA, Container ContainerB, Container ContainerC, Container ContainerY>
     void fmsub(const ContainerA&, const ContainerB&, const ContainerC&, ContainerY&);
-    template<Container ContainerY, typename S, Container ContainerA>
+    template<Container ContainerY, Scalar S, Container ContainerA>
     void fmadd(ContainerY&, const S, const ContainerA&);
-    template<Container ContainerY, typename S, Container ContainerA>
+    template<Container ContainerY, Scalar S, Container ContainerA>
     void fmsub(ContainerY&, const S, const ContainerA&);
 
     // Cross product
