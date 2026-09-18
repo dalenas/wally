@@ -1112,5 +1112,36 @@ TEST(SIMDTests, Fmsub) {
 }
 /*
 TEST(SIMDTests, Cross);
-TEST(SIMDTests, Sqsum);
 */
+TEST(SIMDTests, Sqsum) {
+    const std::size_t N = 10;
+
+    Vector<float> v(N);
+    Vector<int> w(N);
+    Matrix<float> A(N, N);
+    Matrix<int> B(N, N);
+
+    Vector<float> y(N);
+    Vector<int> z(N);
+
+    for(std::size_t i = 0; i < N; ++i) {
+        v(i) = static_cast<float>(i+1);
+        w(i) = static_cast<int>(i+1);
+        for(std::size_t j = 0; j < N; ++j) {
+            A(i, j) = static_cast<float>(i+1);
+            B(i, j) = static_cast<int>(i+1);
+        }
+    }
+
+    float sumf = SIMD::sqsum(v);
+    int sumi = SIMD::sqsum(w);
+    SIMD::sqsum(A, y);
+    SIMD::sqsum(B, z);
+
+    ASSERT_FLOAT_EQ(sumf, 385.0f);
+    ASSERT_EQ(sumi, 385);
+    for(std::size_t i = 0; i < N; ++i) {
+        ASSERT_FLOAT_EQ(y(i), 385.0f);
+        ASSERT_EQ(z(i), 385);
+    }
+}

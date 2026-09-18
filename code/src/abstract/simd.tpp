@@ -1065,7 +1065,7 @@ void SIMD::cross(const ContainerA& A, const ContainerB& B, ContainerY& Y) {
 }
 
 template<typename T>
-float SIMD::sqsum(const Vector<T>& A) {
+T SIMD::sqsum(const Vector<T>& A) {
     const T* const a = A.data();
 
     const std::size_t N = A.size();
@@ -1073,7 +1073,7 @@ float SIMD::sqsum(const Vector<T>& A) {
     const std::size_t EDGE = N - REMAINDER;
 
     std::size_t i = 0;
-    __m256 sum_vec = SIMD_::_mm256_setzero<T>();
+    auto sum_vec = SIMD_::_mm256_setzero<T>();
     for(; i < EDGE; i += WIDTH) {
         const auto a_vec = SIMD_::_mm256_loadu(a + i);
         const auto sq_vec = SIMD_::_mm256_mul(a_vec, a_vec);
@@ -1103,13 +1103,14 @@ void SIMD::sqsum(const Matrix<T>& A, Vector<T>& Y) {
         const std::size_t REMAINDER = M % WIDTH;
         const std::size_t EDGE = M - REMAINDER;
 
+        setzero(Y);
         for(std::size_t i = 0; i < N; ++i) {
             const T* const a_row = a + i*M;
 
             std::size_t j = 0;
             for(; j < EDGE; j += WIDTH) {
                 const auto a_vec = SIMD_::_mm256_loadu(a_row + j);
-                __m256 sum_vec = SIMD_::_mm256_loadu(y + j);
+                auto sum_vec = SIMD_::_mm256_loadu(y + j);
 
                 const auto sq_vec = SIMD_::_mm256_mul(a_vec, a_vec);
                 sum_vec = SIMD_::_mm256_add(sum_vec, sq_vec);
@@ -1119,7 +1120,7 @@ void SIMD::sqsum(const Matrix<T>& A, Vector<T>& Y) {
 
             if(REMAINDER != 0) {
                 const auto a_vec = SIMD_::_mm256_maskloadu(a_row + j, REMAINDER);
-                __m256 sum_vec = SIMD_::_mm256_maskloadu(y + j, REMAINDER);
+                auto sum_vec = SIMD_::_mm256_maskloadu(y + j, REMAINDER);
 
                 const auto sq_vec = SIMD_::_mm256_mul(a_vec, a_vec);
                 sum_vec = SIMD_::_mm256_add(sum_vec, sq_vec);
@@ -1136,7 +1137,7 @@ void SIMD::sqsum(const Matrix<T>& A, Vector<T>& Y) {
             const T* const a_col = a + j*N;
 
             std::size_t i = 0;
-            __m256 sum_vec = SIMD_::_mm256_setzero<T>();
+            auto sum_vec = SIMD_::_mm256_setzero<T>();
             for(; i < EDGE; i += WIDTH) {
                 const auto a_vec = SIMD_::_mm256_loadu(a_col + i);
                 const auto sq_vec = SIMD_::_mm256_mul(a_vec, a_vec);

@@ -159,7 +159,7 @@ namespace Wally::Abstract::SIMD {
 
     // Square sum
     template<typename T>
-    float sqsum(const Vector<T>&);
+    T sqsum(const Vector<T>&);
     template<typename T>
     void sqsum(const Matrix<T>&, Vector<T>&);
 
