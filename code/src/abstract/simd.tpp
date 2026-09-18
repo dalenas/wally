@@ -225,6 +225,25 @@ void SIMD::setzero(ContainerY& Y) {
         SIMD_::_mm256_maskstoreu(y + i, zero, REMAINDER);
 }
 
+template<Scalar S, Container ContainerY>
+void SIMD::set1(const S k, ContainerY& Y) {
+    using U = typename container_traits<ContainerY>::element_type;
+
+    U* const y = Y.data();
+    
+    const std::size_t N = Y.size();
+    const std::size_t REMAINDER = N % WIDTH;
+    const std::size_t EDGE = N - REMAINDER;
+
+    std::size_t i = 0;
+    const auto k_vec = SIMD_::_mm256_set1(k);
+    for(; i < EDGE; i += WIDTH)
+        SIMD_::_mm256_storeu(y + i, k_vec);
+
+    if(REMAINDER != 0)
+        SIMD_::_mm256_maskstoreu(y + i, k_vec, REMAINDER);
+}
+
 template<typename T>
 T SIMD::sum(const Vector<T>& A) {
     const T* const a = A.data();
@@ -852,6 +871,82 @@ void SIMD::fmsub(const ContainerA& A, const ContainerB& B, const ContainerC& C, 
             const auto b_vec = SIMD_::_mm256_maskloadu(b + i, REMAINDER);
             const auto c_vec = SIMD_::_mm256_maskloadu(c + i, REMAINDER);
             auto y_vec = SIMD_::_mm256_fmsub(a_vec, b_vec, c_vec);
+
+            SIMD_::_mm256_maskstoreu(y + i, y_vec, REMAINDER);
+        }
+    }
+}
+
+template<Container ContainerY, Scalar S, Container ContainerA>
+void SIMD::fmadd(ContainerY& Y, const S k, const ContainerA& A) {
+    using A_traits = container_traits<ContainerA>;
+    using Y_traits = container_traits<ContainerY>;
+
+    using T = A_traits::element_type;
+    using U = Y_traits::element_type;
+
+    const T* const a = A.data();
+    U* const y = Y.data();
+
+    const std::size_t N = Y.size();
+    const std::size_t REMAINDER = N % WIDTH;
+    const std::size_t EDGE = N - REMAINDER;
+
+    std::size_t i = 0;
+    const auto k_vec = SIMD_::_mm256_set1(k);
+    if constexpr(Y_traits::container_type == A_traits::container_type) {
+        for(; i < EDGE; i += WIDTH) {
+            const auto a_vec = SIMD_::_mm256_loadu(a + i);
+            auto y_vec = SIMD_::_mm256_loadu(y + i);
+            
+            y_vec = SIMD_::_mm256_fmadd(k_vec, a_vec, y_vec);
+
+            SIMD_::_mm256_storeu(y + i, y_vec);
+        }
+
+        if(REMAINDER != 0) {
+            const auto a_vec = SIMD_::_mm256_maskloadu(a + i, REMAINDER);
+            auto y_vec = SIMD_::_mm256_maskloadu(y + i, REMAINDER);
+
+            y_vec = SIMD_::_mm256_fmadd(k_vec, a_vec, y_vec);
+
+            SIMD_::_mm256_maskstoreu(y + i, y_vec, REMAINDER);
+        }
+    }
+}
+
+template<Container ContainerY, Scalar S, Container ContainerA>
+void SIMD::fmsub(ContainerY& Y, const S k, const ContainerA& A) {
+    using A_traits = container_traits<ContainerA>;
+    using Y_traits = container_traits<ContainerY>;
+
+    using T = A_traits::element_type;
+    using U = Y_traits::element_type;
+
+    const T* const a = A.data();
+    U* const y = Y.data();
+
+    const std::size_t N = Y.size();
+    const std::size_t REMAINDER = N % WIDTH;
+    const std::size_t EDGE = N - REMAINDER;
+
+    std::size_t i = 0;
+    const auto k_vec = SIMD_::_mm256_set1(k);
+    if constexpr(Y_traits::container_type == A_traits::container_type) {
+        for(; i < EDGE; i += WIDTH) {
+            const auto a_vec = SIMD_::_mm256_loadu(a + i);
+            auto y_vec = SIMD_::_mm256_loadu(y + i);
+            
+            y_vec = SIMD_::_mm256_fmsub(k_vec, a_vec, y_vec);
+
+            SIMD_::_mm256_storeu(y + i, y_vec);
+        }
+
+        if(REMAINDER != 0) {
+            const auto a_vec = SIMD_::_mm256_maskloadu(a + i, REMAINDER);
+            auto y_vec = SIMD_::_mm256_maskloadu(y + i, REMAINDER);
+
+            y_vec = SIMD_::_mm256_fmsub(k_vec, a_vec, y_vec);
 
             SIMD_::_mm256_maskstoreu(y + i, y_vec, REMAINDER);
         }

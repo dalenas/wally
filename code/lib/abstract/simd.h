@@ -96,8 +96,10 @@ namespace Wally::Abstract::SIMD {
     constexpr std::size_t WIDTH = 8;
 
     // Sets every element in the container to 0
-    template<Container ContainerA>
-    void setzero(ContainerA&);
+    template<Container ContainerY>
+    void setzero(ContainerY&);
+    template<Scalar S, Container ContainerY>
+    void set1(const S, ContainerY&);
 
     template<typename T>
     T sum(const Vector<T>&);
