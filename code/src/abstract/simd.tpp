@@ -8,9 +8,17 @@ __m256 SIMD::SIMD_::_mm256_maskloadu(const float* const addr, std::size_t k) { r
 __m256i SIMD::SIMD_::_mm256_maskloadu(const int* const addr, std::size_t k) { return _mm256_maskload_epi32(addr, masks[k]); }
 
 void SIMD::SIMD_::_mm256_storeu(float* addr, __m256 a) { _mm256_storeu_ps(addr, a); }
+void SIMD::SIMD_::_mm256_storeu(int* addr, __m256 a) {
+    __m256i ai = _mm256_cvtps_epi32(a);
+    _mm256_storeu_si256(reinterpret_cast<__m256i*>(addr), ai);
+}
 void SIMD::SIMD_::_mm256_storeu(int* addr, __m256i a) { _mm256_storeu_si256(reinterpret_cast<__m256i*>(addr), a); }
 
 void SIMD::SIMD_::_mm256_maskstoreu(float* addr, __m256 a, std::size_t k) { _mm256_maskstore_ps(addr, masks[k], a); }
+void SIMD::SIMD_::_mm256_maskstoreu(int* addr, __m256 a, std::size_t k) {
+    __m256i ai = _mm256_cvtps_epi32(a);
+    _mm256_maskstore_epi32(addr, masks[k], ai);
+}
 void SIMD::SIMD_::_mm256_maskstoreu(int* addr, __m256i a, std::size_t k) { _mm256_maskstore_epi32(addr, masks[k], a); }
 
 __m256 SIMD::SIMD_::_mm256_set1(float k) { return _mm256_set1_ps(k); }
@@ -210,7 +218,7 @@ void SIMD::setzero(ContainerY& Y) {
 
     std::size_t i = 0;
     const auto zero = SIMD_::_mm256_setzero<U>();
-    for(; i < EDGE; i += 8)
+    for(; i < EDGE; i += WIDTH)
         SIMD_::_mm256_storeu(y + i, zero);
 
     if(REMAINDER != 0)
@@ -227,7 +235,7 @@ T SIMD::sum(const Vector<T>& A) {
 
     std::size_t i = 0;
     auto sum_vec = SIMD_::_mm256_setzero<T>();
-    for(; i < EDGE; i += 8) {
+    for(; i < EDGE; i += WIDTH) {
         const auto a_vec = SIMD_::_mm256_loadu(a + i);
 
         sum_vec = SIMD_::_mm256_add(a_vec, sum_vec);
@@ -258,7 +266,7 @@ void SIMD::sum(const Matrix<T>& A, Vector<T>& Y) {
             const T* const a_row = a + i*M;
 
             std::size_t j = 0;
-            for(; j < EDGE; j += 8) {
+            for(; j < EDGE; j += WIDTH) {
                 const auto a_vec = SIMD_::_mm256_loadu(a_row + j);
                 auto sum_vec = SIMD_::_mm256_loadu(y + j);
 
@@ -286,7 +294,7 @@ void SIMD::sum(const Matrix<T>& A, Vector<T>& Y) {
 
             std::size_t i = 0;
             auto sum_vec = SIMD_::_mm256_setzero<T>();
-            for(; i < EDGE; i += 8) {
+            for(; i < EDGE; i += WIDTH) {
                 const auto a_vec = SIMD_::_mm256_loadu(a_col + i);
                 
                 sum_vec = SIMD_::_mm256_add(a_vec, sum_vec);
@@ -345,7 +353,7 @@ void SIMD::add(const S k, const ContainerA& A, ContainerY& Y) {
 
     const auto k_vec = SIMD_::_mm256_set1(k);
     std::size_t i = 0;
-    for(; i < EDGE; i += 8) {
+    for(; i < EDGE; i += WIDTH) {
         const auto a_vec = SIMD_::_mm256_loadu(a + i);
         const auto y_vec = SIMD_::_mm256_add(k_vec, a_vec);
 
@@ -374,7 +382,7 @@ void SIMD::sub(const S k, const ContainerA& A, ContainerY& Y) {
 
     const auto k_vec = SIMD_::_mm256_set1(k);
     std::size_t i = 0;
-    for(; i < EDGE; i += 8) {
+    for(; i < EDGE; i += WIDTH) {
         const auto a_vec = SIMD_::_mm256_loadu(a + i);
         const auto y_vec = SIMD_::_mm256_sub(k_vec, a_vec);
 
@@ -403,7 +411,7 @@ void SIMD::sub(const ContainerA& A, const S k, ContainerY& Y) {
 
     const auto k_vec = SIMD_::_mm256_set1(k);
     std::size_t i = 0;
-    for(; i < EDGE; i += 8) {
+    for(; i < EDGE; i += WIDTH) {
         const auto a_vec = SIMD_::_mm256_loadu(a + i);
         const auto y_vec = SIMD_::_mm256_sub(a_vec, k_vec);
 
@@ -432,7 +440,7 @@ void SIMD::mul(const S k, const ContainerA& A, ContainerY& Y) {
 
     const auto k_vec = SIMD_::_mm256_set1(k);
     std::size_t i = 0;
-    for(; i < EDGE; i += 8) {
+    for(; i < EDGE; i += WIDTH) {
         const auto a_vec = SIMD_::_mm256_loadu(a + i);
         const auto y_vec = SIMD_::_mm256_mul(k_vec, a_vec);
 
@@ -462,7 +470,7 @@ void SIMD::div(const S k, const ContainerA& A, ContainerY& Y) {
     const float k_ps = static_cast<float>(k);
     const __m256 k_vec = SIMD_::_mm256_set1(k_ps);
     std::size_t i = 0;
-    for(; i < EDGE; i += 8) {
+    for(; i < EDGE; i += WIDTH) {
         const auto a_vec = SIMD_::_mm256_loadu(a + i);
         const __m256 y_vec = SIMD_::_mm256_div(k_vec, a_vec);
 
@@ -492,7 +500,7 @@ void SIMD::div(const ContainerA& A, const S k, ContainerY& Y) {
     const float k_ps = static_cast<float>(k);
     const __m256 k_vec = SIMD_::_mm256_set1(k_ps);
     std::size_t i = 0;
-    for(; i < EDGE; i += 8) {
+    for(; i < EDGE; i += WIDTH) {
         const auto a_vec = SIMD_::_mm256_loadu(a + i);
         const __m256 y_vec = SIMD_::_mm256_div(a_vec, k_vec);
 
@@ -527,7 +535,7 @@ void SIMD::add(const ContainerA& A, const ContainerB& B, ContainerY& Y) {
 
     std::size_t i = 0;
     if constexpr(A_traits::container_type == B_traits::container_type){
-        for(; i < EDGE; i += 8) {
+        for(; i < EDGE; i += WIDTH) {
             const auto a_vec = SIMD_::_mm256_loadu(a + i);
             const auto b_vec = SIMD_::_mm256_loadu(b + i);
             const auto y_vec = SIMD_::_mm256_add(a_vec, b_vec);
@@ -565,7 +573,7 @@ void SIMD::sub(const ContainerA& A, const ContainerB& B, ContainerY& Y) {
 
     std::size_t i = 0;
     if constexpr(A_traits::container_type == B_traits::container_type) {
-        for(; i < EDGE; i += 8) {
+        for(; i < EDGE; i += WIDTH) {
             const auto a_vec = SIMD_::_mm256_loadu(a + i);
             const auto b_vec = SIMD_::_mm256_loadu(b + i);
             const auto y_vec = SIMD_::_mm256_sub(a_vec, b_vec);
@@ -603,7 +611,7 @@ void SIMD::mul(const ContainerA& A, const ContainerB& B, ContainerY& Y) {
 
     std::size_t i = 0;
     if constexpr(A_traits::container_type == B_traits::container_type) {
-        for(; i < EDGE; i += 8) {
+        for(; i < EDGE; i += WIDTH) {
             const auto a_vec = SIMD_::_mm256_loadu(a + i);
             const auto b_vec = SIMD_::_mm256_loadu(b + i);
             const auto y_vec = SIMD_::_mm256_mul(a_vec, b_vec);
@@ -641,7 +649,7 @@ void SIMD::div(const ContainerA& A, const ContainerB& B, ContainerY& Y) {
 
     std::size_t i = 0;
     if constexpr(A_traits::container_type == B_traits::container_type) {
-        for(; i < EDGE; i += 8) {
+        for(; i < EDGE; i += WIDTH) {
             const auto a_vec = SIMD_::_mm256_loadu(a + i);
             const auto b_vec = SIMD_::_mm256_loadu(b + i);
             const auto y_vec = SIMD_::_mm256_div(a_vec, b_vec);
@@ -670,7 +678,7 @@ void SIMD::add(ContainerY& Y, const S k) {
 
     std::size_t i = 0;
     const auto k_vec = SIMD_::_mm256_set1(k);
-    for(; i < EDGE; i += 8) {
+    for(; i < EDGE; i += WIDTH) {
         auto y_vec = SIMD_::_mm256_loadu(y + i);
         y_vec = SIMD_::_mm256_add(y_vec, k_vec);
 
@@ -696,7 +704,7 @@ void SIMD::sub(ContainerY& Y, const S k) {
 
     std::size_t i = 0;
     const auto k_vec = SIMD_::_mm256_set1(k);
-    for(; i < EDGE; i += 8) {
+    for(; i < EDGE; i += WIDTH) {
         auto y_vec = SIMD_::_mm256_loadu(y + i);
         y_vec = SIMD_::_mm256_sub(y_vec, k_vec);
 
@@ -722,7 +730,7 @@ void SIMD::mul(ContainerY& Y, const S k) {
 
     std::size_t i = 0;
     const auto k_vec = SIMD_::_mm256_set1(k);
-    for(; i < EDGE; i += 8) {
+    for(; i < EDGE; i += WIDTH) {
         auto y_vec = SIMD_::_mm256_loadu(y + i);
         y_vec = SIMD_::_mm256_mul(y_vec, k_vec);
 
@@ -749,18 +757,18 @@ void SIMD::div(ContainerY& Y, const S k) {
     std::size_t i = 0;
     const float k_ps = static_cast<float>(k);
     const __m256 k_vec = SIMD_::_mm256_set1(k_ps);
-    for(; i < EDGE; i += 8) {
+    for(; i < EDGE; i += WIDTH) {
         auto y_vec = SIMD_::_mm256_loadu(y + i);
-        y_vec = SIMD_::_mm256_div(y_vec, k_vec);
+        __m256 div_vec = SIMD_::_mm256_div(y_vec, k_vec);
 
-        SIMD_::_mm256_storeu(y + i, y_vec);
+        SIMD_::_mm256_storeu(y + i, div_vec);
     }
 
     if(REMAINDER != 0) {
         auto y_vec = SIMD_::_mm256_maskloadu(y + i, REMAINDER);
-        y_vec = SIMD_::_mm256_div(y_vec, k_vec);
+        __m256 div_vec = SIMD_::_mm256_div(y_vec, k_vec);
 
-        SIMD_::_mm256_maskstoreu(y + i, y_vec, REMAINDER);
+        SIMD_::_mm256_maskstoreu(y + i, div_vec, REMAINDER);
     }
 }
 
@@ -787,7 +795,7 @@ void SIMD::fmadd(const ContainerA& A, const ContainerB& B, const ContainerC& C, 
 
     std::size_t i = 0;
     if constexpr(A_traits::container_type == B_traits::container_type && B_traits::container_type == C_traits::container_type) {
-        for(; i < EDGE; i += 8) {
+        for(; i < EDGE; i += WIDTH) {
             const auto a_vec = SIMD_::_mm256_loadu(a + i);
             const auto b_vec = SIMD_::_mm256_loadu(b + i);
             const auto c_vec = SIMD_::_mm256_loadu(c + i);
@@ -830,7 +838,7 @@ void SIMD::fmsub(const ContainerA& A, const ContainerB& B, const ContainerC& C, 
 
     std::size_t i = 0;
     if constexpr(A_traits::container_type == B_traits::container_type && B_traits::container_type == C_traits::container_type) {
-        for(; i < EDGE; i += 8) {
+        for(; i < EDGE; i += WIDTH) {
             const auto a_vec = SIMD_::_mm256_loadu(a + i);
             const auto b_vec = SIMD_::_mm256_loadu(b + i);
             const auto c_vec = SIMD_::_mm256_loadu(c + i);
@@ -1065,7 +1073,7 @@ float SIMD::lpnorm(const float p, const Vector<T>& A) {
     std::size_t i = 0;
     const __m256 p_vec = SIMD_::_mm256_set1(p);
     __m256 sum_vec = SIMD_::_mm256_setzero<float>();
-    for(; i < EDGE; i += 8) {
+    for(; i < EDGE; i += WIDTH) {
         auto a_vec = SIMD_::_mm256_loadu(a + i);
 
         a_vec = SIMD_::_mm256_abs(a_vec);

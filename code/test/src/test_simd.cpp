@@ -637,6 +637,7 @@ TEST(SIMDTests, Add) {
         }
     }
 
+    // Broadcast scalar add
     SIMD::add(K, v, y);
     SIMD::add(C, w, z);
     SIMD::add(K, A, Y);
@@ -651,6 +652,7 @@ TEST(SIMDTests, Add) {
         }
     }
 
+    // Element-wise add
     SIMD::add(v, v, y);
     SIMD::add(w, w, z);
     SIMD::add(A, A, Y);
@@ -662,6 +664,21 @@ TEST(SIMDTests, Add) {
         for(std::size_t j = 0; j < N; ++j) {
             ASSERT_FLOAT_EQ(Y(i, j), 2*static_cast<float>(i*N + j + 1));
             ASSERT_EQ(Z(i, j), 2*static_cast<int>(i*N + j + 1));
+        }
+    }
+
+    // Compound scalar add
+    SIMD::add(v, K);
+    SIMD::add(w, C);
+    SIMD::add(A, K);
+    SIMD::add(B, C);
+
+    for(std::size_t i = 0; i < N; ++i) {
+        ASSERT_FLOAT_EQ(v(i), static_cast<float>(i+1) + K);
+        ASSERT_EQ(w(i), static_cast<int>(i+1) + C);
+        for(std::size_t j = 0; j < N; ++j) {
+            ASSERT_FLOAT_EQ(A(i, j), static_cast<float>(i*N + j + 1) + K);
+            ASSERT_EQ(B(i, j), static_cast<int>(i*N + j + 1) + C);
         }
     }
 }
@@ -696,6 +713,7 @@ TEST(SIMDTests, Sub) {
         }
     }
 
+    // Broadcast scalar sub
     SIMD::sub(K, v, y1);
     SIMD::sub(C, w, z1);
     SIMD::sub(v, K, y2);
@@ -715,6 +733,36 @@ TEST(SIMDTests, Sub) {
             ASSERT_EQ(Z1(i, j), C - static_cast<float>(i*N + j + 1));
             ASSERT_FLOAT_EQ(Y2(i, j), static_cast<float>(i*N + j + 1) - K);
             ASSERT_EQ(Z2(i, j), static_cast<float>(i*N + j + 1) - C);
+        }
+    }
+
+    // Element-wise sub
+    SIMD::sub(v, v, y1);
+    SIMD::sub(w, w, z1);
+    SIMD::sub(A, A, Y1);
+    SIMD::sub(B, B, Z1);
+
+    for(std::size_t i = 0; i < N; ++i) {
+        ASSERT_FLOAT_EQ(y1(i), 0.0f);
+        ASSERT_EQ(z1(i), 0);
+        for(std::size_t j = 0; j < N; ++j) {
+            ASSERT_FLOAT_EQ(Y1(i, j), 0.0f);
+            ASSERT_EQ(Z1(i, j), 0);
+        }
+    }
+
+    // Compound scalar sub
+    SIMD::sub(v, K);
+    SIMD::sub(w, C);
+    SIMD::sub(A, K);
+    SIMD::sub(B, C);
+
+    for(std::size_t i = 0; i < N; ++i) {
+        ASSERT_FLOAT_EQ(v(i), static_cast<float>(i+1) - K);
+        ASSERT_EQ(w(i), static_cast<int>(i+1) - C);
+        for(std::size_t j = 0; j < N; ++j) {
+            ASSERT_FLOAT_EQ(A(i, j), static_cast<float>(i*N + j + 1) - K);
+            ASSERT_EQ(B(i, j), static_cast<int>(i*N + j + 1) - C);
         }
     }
 }
@@ -745,6 +793,7 @@ TEST(SIMDTests, Mul) {
         }
     }
 
+    // Broadcast scalar mul
     SIMD::mul(K, v, y);
     SIMD::mul(C, w, z);
     SIMD::mul(K, A, Y);
@@ -756,6 +805,36 @@ TEST(SIMDTests, Mul) {
         for(std::size_t j = 0; j < N; ++j) {
             ASSERT_FLOAT_EQ(Y(i, j), K * static_cast<float>(i*N + j + 1));
             ASSERT_EQ(Z(i, j), C * static_cast<int>(i*N + j + 1));
+        }
+    }
+
+    // Element-wise mul
+    SIMD::mul(v, v, y);
+    SIMD::mul(w, w, z);
+    SIMD::mul(A, A, Y);
+    SIMD::mul(B, B, Z);
+
+    for(std::size_t i = 0; i < N; ++i) {
+        ASSERT_FLOAT_EQ(y(i), static_cast<float>(i+1)*static_cast<float>(i+1));
+        ASSERT_EQ(z(i), static_cast<int>(i+1)*static_cast<int>(i+1));
+        for(std::size_t j = 0; j < N; ++j) {
+            ASSERT_FLOAT_EQ(Y(i, j), static_cast<float>(i*N + j + 1)*static_cast<float>(i*N + j + 1));
+            ASSERT_EQ(Z(i, j), static_cast<int>(i*N + j + 1)*static_cast<int>(i*N + j + 1));
+        }
+    }
+
+    // Compound scalar mul
+    SIMD::mul(v, K);
+    SIMD::mul(w, C);
+    SIMD::mul(A, K);
+    SIMD::mul(B, C);
+
+    for(std::size_t i = 0; i < N; ++i) {
+        ASSERT_FLOAT_EQ(v(i), static_cast<float>(i+1)*K);
+        ASSERT_EQ(w(i), static_cast<int>(i+1)*C);
+        for(std::size_t j = 0; j < N; ++j) {
+            ASSERT_FLOAT_EQ(A(i, j), static_cast<float>(i*N + j + 1)*K);
+            ASSERT_EQ(B(i, j), static_cast<int>(i*N + j + 1)*C);
         }
     }
 }
@@ -790,6 +869,7 @@ TEST(SIMDTests, Div) {
         }
     }
 
+    // Broadcast scalar div
     SIMD::div(K, v, y1);
     SIMD::div(C, w, z1);
     SIMD::div(v, K, y2);
@@ -809,6 +889,36 @@ TEST(SIMDTests, Div) {
             ASSERT_FLOAT_EQ(Z1(i, j), static_cast<float>(C) / static_cast<float>(i*N + j + 1));
             ASSERT_FLOAT_EQ(Y2(i, j), static_cast<float>(i*N + j + 1) / K);
             ASSERT_FLOAT_EQ(Z2(i, j), static_cast<float>(i*N + j + 1) / static_cast<float>(C));
+        }
+    }
+
+    // Element-wise div
+    SIMD::div(v, v, y1);
+    SIMD::div(w, w, z1);
+    SIMD::div(A, A, Y1);
+    SIMD::div(B, B, Z1);
+
+    for(std::size_t i = 0; i < N; ++i) {
+        ASSERT_FLOAT_EQ(y1(i), 1.0f);
+        ASSERT_FLOAT_EQ(z1(i), 1.0f);
+        for(std::size_t j = 0; j < N; ++j) {
+            ASSERT_FLOAT_EQ(Y1(i, j), 1.0f);
+            ASSERT_FLOAT_EQ(Z1(i, j), 1.0f);
+        }
+    }
+
+    // Compound scalar div
+    SIMD::div(v, K);
+    SIMD::div(w, C);
+    SIMD::div(A, K);
+    SIMD::div(B, C);
+
+    for(std::size_t i = 0; i < N; ++i) {
+        ASSERT_FLOAT_EQ(v(i), static_cast<float>(i+1) / K);
+        ASSERT_NEAR(w(i), static_cast<int>(static_cast<float>(i+1) / static_cast<float>(C)), 1);
+        for(std::size_t j = 0; j < N; ++j) {
+            ASSERT_FLOAT_EQ(A(i, j), static_cast<float>(i*N + j + 1) / K);
+            ASSERT_NEAR(B(i, j), static_cast<int>(static_cast<float>(i*N + j + 1) / static_cast<float>(C)), 1);
         }
     }
 }

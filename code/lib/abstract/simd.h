@@ -26,9 +26,11 @@ namespace Wally::Abstract::SIMD {
         __m256i _mm256_maskloadu(const int* const, std::size_t);
 
         inline void _mm256_storeu(float*, __m256);
+        inline void _mm256_storeu(int*, __m256);
         inline void _mm256_storeu(int*, __m256i);
 
         void _mm256_maskstoreu(float*, __m256, std::size_t);                           // masked store for remainder calcs
+        void _mm256_maskstoreu(int*, __m256, std::size_t);
         void _mm256_maskstoreu(int*, __m256i, std::size_t);
 
         template<typename T>
