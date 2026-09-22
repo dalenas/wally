@@ -984,7 +984,7 @@ void SIMD::cross(const ContainerA& A, const ContainerB& B, ContainerY& Y) {
                 const T* const b_col = b + j*K;
 
                 std::size_t k = 0;
-                auto sum_vec = SIMD_::_mm256_setzero<U>();
+                auto sum_vec = SIMD_::_mm256_setzero<float>();
                 for(; k < EDGE; k += WIDTH) {
                     const auto a_vec = SIMD_::_mm256_loadu(a_row + k);
                     const auto b_vec = SIMD_::_mm256_loadu(b_col + k);
@@ -1044,7 +1044,7 @@ void SIMD::cross(const ContainerA& A, const ContainerB& B, ContainerY& Y) {
             const S* const a_j = a + j*N;
 
             std::size_t i = 0;
-            auto sum_vec = SIMD_::_mm256_setzero<U>();
+            __m256 sum_vec = SIMD_::_mm256_setzero<float>();
             for(; i < EDGE; i += WIDTH) {
                 const auto a_vec = SIMD_::_mm256_loadu(a_j + i);
                 const auto b_vec = SIMD_::_mm256_loadu(b + i);

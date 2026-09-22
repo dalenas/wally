@@ -9,6 +9,13 @@ Vector<T>::Vector(std::size_t s, T init)
     : size_(s) { data_.assign(size_, init); }
 
 template<typename T>
+Vector<T>::Vector(const std::vector<std::vector<T>>& M) 
+    : size_(M.size()) {
+    for(std::size_t i = 0; i < size_; ++i)
+        data_[i] = M[i][0];
+}
+
+template<typename T>
 Vector<T>::Vector(const Vector<T>& v) 
     : size_(v.size()) {
     data_.reserve(v.size());
@@ -62,7 +69,25 @@ Matrix<U>::Matrix(std::size_t r, std::size_t c, Major a)
 
 template<typename U>
 Matrix<U>::Matrix(std::size_t r, std::size_t c, Major a, U init)
-    : rows_(r), cols_(c), axis_(a) { data_.assign(rows_* cols_, init); }
+    : rows_(r), cols_(c), axis_(a) { data_.assign(rows_ * cols_, init); }
+
+template<typename U>
+Matrix<U>::Matrix(const std::vector<std::vector<U>>& M) 
+    : rows_(M[0].size()), cols_(M.size()) {
+    axis_ = rows_ >= 8 ? Major::row : Major::col;               // temporary while I figure out the best way to decide
+    
+    if(axis_ == Major::row) {
+        for(std::size_t i = 0; i < rows_; ++i) {
+            for(std::size_t j = 0; j < cols_; ++j)
+                data_[j + i*cols_] = M[i][j];
+        }
+    } else {
+        for(std::size_t j = 0; j < cols_, ++j) {
+            for(std::size_t i = 0; i < rows_; ++i)
+                data_[i + j*rows_] = M[i][j];
+        }
+    }
+}
 
 template<typename U>
 Matrix<U>::Matrix(const Matrix<U>& X)

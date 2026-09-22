@@ -11,12 +11,13 @@ namespace Wally {
 
     template <typename T>
     class Vector {
-        std::vector<T> data_;
         std::size_t size_;
+        std::vector<T> data_;
 
     public:
         Vector(std::size_t);
         Vector(std::size_t, T);
+        Vector(const std::vector<std::vector<T>>&);
 
         Vector(const Vector<T>&);
         Vector<T>& operator=(const Vector<T>&);
@@ -34,15 +35,16 @@ namespace Wally {
 
     template <typename U>
     class Matrix {
-        std::vector<U> data_;
         std::size_t rows_;
         std::size_t cols_;
         Major axis_;
+        std::vector<U> data_;
 
     public:
         Matrix(std::size_t, std::size_t);
         Matrix(std::size_t, std::size_t, Major);
         Matrix(std::size_t, std::size_t, Major, U);
+        Matrix(const std::vector<std::vector<U>>&);
 
         Matrix(const Matrix<U>&);
         Matrix<U>& operator=(const Matrix<U>&);
