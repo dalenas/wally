@@ -19,21 +19,32 @@ namespace Wally::Abstract::SIMD {
             _mm256_setr_epi32(-1, -1, -1, -1, -1, -1, -1, -1)
         };
 
-        inline __m256 _mm256_loadu(const float* const);
-        inline __m256i _mm256_loadu(const int* const);
+        inline __m256 _mm256_loadu(const float* addr) {
+            return _mm256_loadu_ps(addr);
+        }
+        inline __m256i _mm256_loadu(const int* const addr) {
+            return _mm256_loadu_si256(reinterpret_cast<const __m256i*>(addr));
+        }
 
         __m256 _mm256_maskloadu(const float* const, std::size_t);                      // masked load for remainder calculations
         __m256i _mm256_maskloadu(const int* const, std::size_t);
 
-        inline void _mm256_storeu(float*, __m256);
-        inline void _mm256_storeu(int*, __m256);
-        inline void _mm256_storeu(int*, __m256i);
+        inline void _mm256_storeu(float* addr, __m256 a) {
+            _mm256_storeu_ps(addr, a);
+        }
+        inline void _mm256_storeu(int* addr, __m256 a) {
+            __m256i ai = _mm256_cvtps_epi32(a);
+            _mm256_storeu_si256(reinterpret_cast<__m256i*>(addr), ai);
+        }
+        inline void _mm256_storeu(int* addr, __m256i a) {
+            _mm256_storeu_si256(reinterpret_cast<__m256i*>(addr), a);
+        }
 
         void _mm256_maskstoreu(float*, __m256, std::size_t);                           // masked store for remainder calcs
         void _mm256_maskstoreu(int*, __m256, std::size_t);
         void _mm256_maskstoreu(int*, __m256i, std::size_t);
 
-        template<typename T>
+        template<Scalar S>
         auto _mm256_setzero();
 
         __m256 _mm256_set1(float);
@@ -92,6 +103,9 @@ namespace Wally::Abstract::SIMD {
 
         __m256 _mm256_rcp(__m256);
         __m256 _mm256_rcp(__m256i);
+
+        __m256 _mm256_sqrt(__m256);
+        __m256 _mm256_sqrt(__m256i);
     }
     constexpr std::size_t WIDTH = 8;
 
@@ -163,6 +177,9 @@ namespace Wally::Abstract::SIMD {
     template<typename T>
     void sqsum(const Matrix<T>&, Vector<T>&);
 
+    template<Container ContainerA, Container ContainerY>
+    void sqrt(const ContainerA&, ContainerY&);
+
     // Lp norm
     /*
     template<typename T>
@@ -173,7 +190,7 @@ namespace Wally::Abstract::SIMD {
 
     // Sigmoid and softmax
     // void softmax(const Matrix<float>&, const Vector<int>&, Matrix<float>&);
-}
+};
 
 #include "abstract/simd.tpp"
 

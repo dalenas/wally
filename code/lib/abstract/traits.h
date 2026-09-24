@@ -33,6 +33,6 @@ namespace Wally::Abstract {
         x.data();
         x.size();
     };
-}
+};
 
 #endif
