@@ -4,50 +4,57 @@
 namespace Wally::Stats {
     template<typename T>
     float mean(const Vector<T>& x) {
-        const std::size_t N = x.size();
-        return SIMD::sum(x) / N;
+        const float N_ps = static_cast<float>(x.size());
+        return Abstract::SIMD::sum(x) / N_ps;
     }
 
     template<typename T>
     Vector<float> mean(const Matrix<T>& X) {
         const std::size_t N = X.rows();
+        const float N_ps = static_cast<float>(N);
         const std::size_t M = X.cols();
 
-        Vector<float> sums(M);
-        SIMD::sum(X, sums);
+        Vector<float> mus(M);
+        Abstract::SIMD::sum(X, mus);
+        Abstract::SIMD::div(mus, N_ps);
 
-        return SIMD::div(sums, N);
+        return mus;
     }
 
     template<typename T>
     float var(const Vector<T>& x) {
         const std::size_t N = x.size();
+        const float N_ps = static_cast<float>(N);
 
         const float mu = mean(x);
         Vector<float> z(N);
-        SIMD::sub(x, mu, z);
+        Abstract::SIMD::sub(x, mu, z);
 
-        return SIMD::sqsum(z) / N;
+        return Abstract::SIMD::sqsum(z) / N_ps;
     }
 
     template<typename T>
     Vector<float> var(const Matrix<T>& X) {     // Want to make a simd overload for Matrix - Vector so I can just subtract a the means like that
         const std::size_t N = X.rows();         // Nevermind I just made it
+        const float N_ps = static_cast<float>(N);
         const std::size_t M = X.cols();
 
         Vector<float> mus = mean(X);
         Matrix<float> Z(N, M);
-        SIMD::sub(X, mus, Z);
+        Abstract::SIMD::sub(X, mus, Z);
 
-        Vector<float> sqsums(M);
-        SIMD::sqsum(Z, sqsums);
+        Vector<float> sigma_sqs(M);
+        Abstract::SIMD::sqsum(Z, sigma_sqs);
+        Abstract::SIMD::div(sigma_sqs, N_ps);
 
-        return SIMD::div(sqsums, N);
+        return sigma_sqs;
     }
     
     template<typename T>
     float stdd(const Vector<T>& x) {
-        return sqrt(var(x));
+        float sigma = sqrt(var(x));
+        // std::cout << "Stdd: " << sigma << std::endl;
+        return sigma;
     }
 
     template<typename T>
@@ -56,8 +63,11 @@ namespace Wally::Stats {
 
         Vector<float> sigma_sqs = var(X);
         Vector<float> sigmas(M);
-        SIMD::sqrt(sigma_sqs, sigmas);
+        Abstract::SIMD::sqrt(sigma_sqs, sigmas);
 
+        //std::cout << "Stdds: ";
+        //std::cout << sigmas << std::endl;
+        
         return sigmas;
     }
 };

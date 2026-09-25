@@ -46,6 +46,7 @@ namespace Wally {
 
     public:
         Matrix(std::size_t, std::size_t);
+        Matrix(std::size_t, std::size_t, U);
         Matrix(std::size_t, std::size_t, Major);
         Matrix(std::size_t, std::size_t, Major, U);
         Matrix(const std::vector<std::vector<U>>&);

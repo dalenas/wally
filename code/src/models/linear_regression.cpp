@@ -2,19 +2,30 @@
 
 namespace Wally {
     void LinearRegression::compute_errors(const Vector<float>& y) {
-        Abstract::SIMD::sub(y, workbench.y_hat, workbench.errors);
+        Abstract::SIMD::sub(workbench.y_hat, y, workbench.errors);
+
+        /*
+        std::cout << "Errors: " << std::endl;
+        std::cout << workbench.errors << std::endl;
+        */
     }
 
     void LinearRegression::compute_gradient(const Matrix<float>& X) {
-        const float N = static_cast<float>(workbench.errors.size());
-        
+        const float K = 2.0f / static_cast<float>(workbench.errors.size());
+
         if(X.axis() == Major::row)
             Abstract::SIMD::cross(workbench.errors, X, workbench.grad);
         else
             Abstract::SIMD::cross(X, workbench.errors, workbench.grad);
-        Abstract::SIMD::div(workbench.grad, N);
+        Abstract::SIMD::mul(workbench.grad, K);
 
-        workbench.grad_b = Abstract::SIMD::sum(workbench.errors) / N;
+        workbench.grad_b = K * Abstract::SIMD::sum(workbench.errors);
+
+        /*
+        std::cout << "Gradient: " << std::endl;
+        std::cout << workbench.grad_b << std::endl;
+        std::cout << workbench.grad << std::endl;
+        */
     }
 
     void LinearRegression::gradient_descent(const float alpha) {
@@ -42,7 +53,11 @@ namespace Wally {
             Abstract::SIMD::cross(weights, X, workbench.y_hat);
 
         Abstract::SIMD::add(workbench.y_hat, bias);
-        params();
+
+        /*
+        std::cout << "Predict:" << std::endl;
+        std::cout << workbench.y_hat << std::endl;
+        */
     }
 
     LinearRegression::LinearRegression()

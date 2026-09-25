@@ -71,6 +71,17 @@ namespace Wally {
     }
 
     template<typename U>
+    Matrix<U>::Matrix(std::size_t r, std::size_t c, U init)
+        : rows_(r), cols_(c) {
+        axis_ = cols_ >= 8 ? Major::col : Major::row;
+
+        const std::size_t size_ = rows_*cols_;
+        data_.resize(size_);
+        for(std::size_t i = 0; i < size_; ++i)
+            data_[i] = init;
+    }
+
+    template<typename U>
     Matrix<U>::Matrix(std::size_t r, std::size_t c, Major a)
         : rows_(r), cols_(c), axis_(a) { data_.reserve(rows_*cols_); }
 

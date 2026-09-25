@@ -7,8 +7,8 @@ namespace Wally::Stats {
         const float sigma = stdd(x);
 
         Vector<float> z(N);
-        SIMD::sub(x, mu, z);
-        SIMD::div(z, sigma);
+        Abstract::SIMD::sub(x, mu, z);
+        Abstract::SIMD::div(z, sigma);
 
         return z;
     }
@@ -19,10 +19,11 @@ namespace Wally::Stats {
         const Vector<float> mus = mean(X);
         const Vector<float> sigmas = stdd(X);
 
-        Matrix<float> Z_sigma(N, M);
-        SIMD::sub(X, mus, Z_sigma);
-        Matrix<float> Z(N, M);              // Will make a simd compound div so i dont have to make another object
-        SIMD::div(Z_sigma, sigmas, Z);
+        Matrix<float> Z_sigma(N, M, 0.0f);
+        Abstract::SIMD::sub(X, mus, Z_sigma);
+
+        Matrix<float> Z(N, M, 0.0f);              // Will make a simd compound div so i dont have to make another object
+        Abstract::SIMD::div(Z_sigma, sigmas, Z);
 
         return Z;
     }
