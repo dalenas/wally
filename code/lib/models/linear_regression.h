@@ -14,21 +14,21 @@ namespace Wally {
         virtual void predict_(const Matrix<float>&);
 
     protected:
-        struct LinearRegressionWorkbench {
+        struct Workbench {
             Vector<float> y_hat;
             Vector<float> errors;
             float grad_b;
             Vector<float> grad;
 
-            LinearRegressionWorkbench(const std::size_t N, const std::size_t D)
+            Workbench(const std::size_t N, const std::size_t D)
                 : y_hat(Vector<float>(N, 0.0f)), errors(Vector<float>(N, 0.0f)), grad_b(0.0f), grad(Vector<float>(D, 0.0f)) {}
 
-            ~LinearRegressionWorkbench() = default;
+            ~Workbench() = default;
         };
 
         float bias;
         Vector<float> weights;
-        LinearRegressionWorkbench workbench;
+        Workbench workbench;
 
     public:
         LinearRegression();

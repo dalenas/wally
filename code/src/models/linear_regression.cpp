@@ -43,7 +43,7 @@ namespace Wally {
     void LinearRegression::fit(const Matrix<float>& X) {
         bias = 0.0f;
         weights = Vector<float>(X.cols(), 0.0f);
-        workbench = LinearRegressionWorkbench(X.rows(), X.cols());
+        workbench = Workbench(X.rows(), X.cols());
     }
 
     void LinearRegression::predict_(const Matrix<float>& X) {

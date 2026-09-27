@@ -4,27 +4,46 @@
 #include "ml.h"
 
 namespace Wally {
-    class BinaryLogisticRegression : public Classifier {
+    class BinaryRegression : public Classifier {
+        struct Workbench {
+            Vector<float> logits;
+            Vector<float> probs;
+            
+            Vector<int> y_hat;
+            Vector<float> errors;
+            
+            float grad_b;
+            Vector<float> grad;
+
+            Workbench(const std::size_t N, const std::size_t D)
+                : logits(Vector<float>(N, 0.0f)), probs(Vector<float>(N, 0.0f)), 
+                y_hat(Vector<int>(N, 0)), errors(Vector<float>(N, 0.0f)), 
+                grad_b(0.0f), grad(Vector<float>(D, 0.0f)) {}
+
+            ~Workbench() = default;
+        }
+
         float bias;
         Vector<float> weights;
+        Workbench workbench;
 
-        float z(const Vector<float>&);
-        float sigmoid(const Vector<float>&);
-        Vector<float> sigmoid(const Matrix<float>&);
+        void z(const Matrix<float>&);
+        void sigmoid();
 
-        Vector<float> compute_errors(const Vector<int>&, const Vector<float>&);
+        void compute_errors(const Vector<int>&);
         float log_loss(const Vector<int>&, const Vector<float>&);
-        Vector<float> compute_gradient(const Matrix<float>&, const Vector<int>&, const Vector<float>&);
+        void compute_gradient(const Matrix<float>&, const Vector<int>&, const Vector<float>&);
         void gradient_descent(const Vector<float>&, const float);
 
         virtual void fit(const Matrix<float>&, const Vector<int>&) override;
+        virtual void predict_(const Matrix<float>&);
         
     public:
-        BinaryLogisticRegression() = default;
+        BinaryRegression();
         virtual void train(const Matrix<float>&, const Vector<int>&, const float, const float, const std::size_t) override;
         virtual Vector<int> predict(const Matrix<float>&) override;
-        virtual void _params() override;
-        ~BinaryLogisticRegression() = default;
+        virtual void params() override;
+        ~BinaryRegression() = default;
     };
 }
 
