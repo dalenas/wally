@@ -19,27 +19,40 @@ void BinaryRegression::compute_errors(const Vector<int>& y) {
 }
 
 float BinaryRegression::log_loss(const Vector<int>& y) {
-    
+    // need another simd for doing log calculations
 }
 
-void BinaryRegression::compute_gradient(const Matrix<float>& X, const Vector<int>& y) {
+void BinaryRegression::compute_gradient(const Matrix<float>& X) {
+    const float K = -2.0f / static_cast<float>(workbench.errors.size());
 
+    if(X.axis() == Major::row)
+        Abstract::SIMD::cross(workbench.errors, X, workbench.grad);
+    else
+        Abstract::SIMD::cross(X, workbench.errors, workbench.grad);
+    Abstract::SIMD::mul(workbench.grad, K);
+
+    workbench.grad_b = K * Abtract::SIMD::sum(workbench.errors);
 }
 
-void BinaryRegression::gradient_descent(const Vector<float>&, const float) {
-
+void BinaryRegression::gradient_descent(const float alpha) {
+    grad_b -= alpha*workbench.grad_b;
+    Abstract::SIMD::sub(weights, alpha, workbench.grad);
 }
 
-void BinaryRegression::fit(const Matrix<float>&, const Vector<int>&) {
-
+void BinaryRegression::fit(const Matrix<float>& X) {
+    bias = 0.0f;
+    weights = Vector<float>(X.cols(), 0.0f);
+    workbench = Workbench(X.rows(), X.cols());
 }
 
-BinaryRegression::BinaryRegression() {
+BinaryRegression::BinaryRegression()
+    : weights(0), workbench(0, 0) {}
 
-}
-
-void BinaryRegression::train(const Matrix<float>&, const Vector<int>&, const float, const float, const std::size_t) {
-
+void BinaryRegression::train(const Matrix<float>& X, const Vector<int>& y, const float alpha, const float tol, const std::size_t max_iter) {
+    fit(X);
+    for(std::size_t iter = 0; iter < max_iter; ++iter) {
+        
+    }
 }
 
 Vector<int> BinaryRegression::predict(const Matrix<float>&) {

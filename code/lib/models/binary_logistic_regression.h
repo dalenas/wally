@@ -31,11 +31,11 @@ namespace Wally {
         void sigmoid();
 
         void compute_errors(const Vector<int>&);
-        float log_loss(const Vector<int>&, const Vector<float>&);
-        void compute_gradient(const Matrix<float>&, const Vector<int>&, const Vector<float>&);
-        void gradient_descent(const Vector<float>&, const float);
+        float log_loss(const Vector<int>&);
+        void compute_gradient(const Matrix<float>&);
+        void gradient_descent(const float);
 
-        virtual void fit(const Matrix<float>&, const Vector<int>&) override;
+        virtual void fit(const Matrix<float>&) override;
         virtual void predict_(const Matrix<float>&);
         
     public:
